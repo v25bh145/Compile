@@ -6,7 +6,6 @@
 using namespace std;
 
 //将本层的节点装载到上层，搜索下层的子节点并在下层装配至此层节点中
-//program总能成功，因为program -> null | segment program
 matchInfo Parser::program(Nonterminal* father) {
     //创建本层节点
     Nonterminal* son = new Nonterminal(PROGRAM);
@@ -1081,6 +1080,7 @@ matchInfo Parser::val(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+//switch
 matchInfo Parser::elem(Nonterminal* father) {
     //创建本层节点
     Nonterminal* son = new Nonterminal(ELEM);
@@ -1300,8 +1300,654 @@ matchInfo Parser::literal(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+matchInfo Parser::subprogram(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(SUBPROGRAM);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
 
+    //nonterminal
+    auto localdefRes = localdef(son);
+    if(localdefRes.status) {
+        //nonterminal
+        auto subprogramRes = subprogram(son);
+        if(!subprogramRes.status) {
+            //terminal
+            iterator = last;
+            son->setChild(NULL);
+        }
+    } else {
+        iterator = last;
+        //nonterminal
+        auto statementRes = statement(son);
+        if(statementRes.status) {
+            //nonterminal
+            auto subprogramRes = subprogram(son);
+            if(!subprogramRes.status) {
+                //terminal
+                iterator = last;
+                son->setChild(NULL);
+            }
+        } else {
+            //terminal
+            iterator = last;
+            son->setChild(NULL);   
+        }
+    }
 
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::localdef(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(LOCALDEF);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
 
+    //nonterminal
+    auto typeRes = type(son);
+    if(typeRes.status) {
+        //nonterminal
+        auto defdataRes = defdata(son);
+        if(defdataRes.status) {
+            //nonterminal
+            auto deflistRes = deflist(son);
+            if(!deflistRes.status) {
+                iterator = last;
+                return {false, "deflist > " + deflistRes.info};
+            }
+        } else {
+            iterator = last;
+            return {false, "defdata > " + defdataRes.info};
+        }
+    } else {
+        iterator = last;
+        return {false, "type > " + typeRes.info};
+    }
 
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+//switch
+matchInfo Parser::statement(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(STATEMENT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
 
+    switch(scan()->tag) {
+        //terminal
+        case KW_BREAK: {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //terminal
+            if(scan()->tag == SEMICON) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+            } else {
+                iterator = last;
+                return {false, "SEMICON"};
+            }
+            break;
+        }
+        //terminal
+        case KW_CONTINUE: {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //terminal
+            if(scan()->tag == SEMICON) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+            } else {
+                iterator = last;
+                return {false, "SEMICON"};
+            }
+            break;
+        }
+        //terminal
+        case KW_RETURN: {
+            //nonterminal
+            auto altexprRes = altexpr(son);
+            if(altexprRes.status) {
+                //terminal
+                if(scan()->tag == SEMICON) {
+                    Terminal* tagSon = new Terminal(scan()->tag);
+                    son->setChild(tagSon);
+                    move();
+                } else {
+                    iterator = last;
+                    return {false, "SEMICON"};
+                }
+            } else {
+                iterator = last;
+                return {false, "altexpr > " + altexprRes.info};
+            }
+            break;
+        }
+        default: {
+            //nonterminal
+            auto altexprRes = altexpr(son);
+            if(altexprRes.status) {
+                //terminal
+                if(scan()->tag == SEMICON) {
+                    Terminal* tagSon = new Terminal(scan()->tag);
+                    son->setChild(tagSon);
+                    move();
+                } else {
+                    iterator = last;
+                    return {false, "SEMICON"};
+                }
+            } else {
+                //nonterminal
+                iterator = last;
+                auto whilestatRes = whilestat(son);
+                if(!whilestatRes.status) {
+                    //nonterminal
+                    iterator = last;
+                    auto forstatRes = forstat(son);
+                    if(!forstatRes.status) {
+                        //nonterminal
+                        iterator = last;
+                        auto dowhilestatRes = dowhilestat(son);
+                        if(!dowhilestatRes.status) {
+                            //nonterminal
+                            iterator = last;
+                            auto ifstatRes = ifstat(son);
+                            if(!ifstatRes.status) {
+                                //nonterminal
+                                iterator = last;
+                                auto switchstatRes = switchstat(son);
+                                if(!switchstatRes.status) {
+                                    iterator = last;
+                                    return {false, "(KW_BREAK | KW_CONTINUE | KW_RETURN | altexpr | whilestat | forstat | dowhilestat | ifstat | switchstat)"};
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::whilestat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(WHILESTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_WHILE) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move();
+        //terminal
+        if(scan()->tag == LPAREN) {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //nonterminal
+            auto altexprRes = altexpr(son);
+            if(altexprRes.status) {
+                //terminal
+                if(scan()->tag == RPAREN) {
+                    Terminal* tagSon = new Terminal(scan()->tag);
+                    son->setChild(tagSon);
+                    move();
+                    //nonterminal
+                    auto blockRes = block(son);
+                    if(!blockRes.status) {
+                        iterator = last;
+                        return {false, "block > " + blockRes.info};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "RPAREN"};
+                }
+            } else {
+                iterator = last;
+                return {false, "altexpr > " + altexprRes.info};
+            }
+        } else {
+            iterator = last;
+            return {false, "LPAREN"};
+        }
+    } else {
+        iterator = last;
+        return {false, "KW_WHILE"};
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::dowhilestat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(DOWHILESTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_DO) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move();
+        //nonterminal
+        auto blockRes = block(son);
+        if(blockRes.status) {
+            //terminal
+            if(scan()->tag == KW_WHILE) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+                //terminal
+                if(scan()->tag == LPAREN) {
+                    Terminal* tagSon = new Terminal(scan()->tag);
+                    son->setChild(tagSon);
+                    move();
+                    //nonterminal
+                    auto altexprRes = altexpr(son);
+                    if(altexprRes.status) {
+                        //terminal
+                        if(scan()->tag == RPAREN) {
+                            Terminal* tagSon = new Terminal(scan()->tag);
+                            son->setChild(tagSon);
+                            move();
+                            //terminal
+                            if(scan()->tag == SEMICON) {
+                                Terminal* tagSon = new Terminal(scan()->tag);
+                                son->setChild(tagSon);
+                                move();
+                            } else {
+                                iterator = last;
+                                return {false, "SEMICON"};
+                            }
+                        } else {
+                            iterator = last;
+                            return {false, "RPAREN"};
+                        }
+                    } else {
+                        iterator = last;
+                        return {false, "altexpr > " + altexprRes.info};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "LPAREN"};
+                }
+            } else {
+                iterator = last;
+                return {false, "KW_WHILE"};
+            }
+        } else {
+            iterator = last;
+            return {false, "block > " + blockRes.info};
+        }
+    } else {
+        iterator = last;
+        return {false, "KW_DO"};
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::forstat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(FORSTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_FOR) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move();
+            //terminal
+            if(scan()->tag == LPAREN) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+                //nonterminal
+                auto forinitRes = forinit(son);
+                if(forinitRes.status) {
+                    //nonterminal
+                    auto altexprRes = altexpr(son);
+                    if(altexprRes.status) {
+                        //terminal
+                        if(scan()->tag == SEMICON) {
+                            Terminal* tagSon = new Terminal(scan()->tag);
+                            son->setChild(tagSon);
+                            move();
+                            //nonterminal
+                            auto altexpr2Res = altexpr(son);
+                            if(altexpr2Res.status) {
+                                //terminal
+                                if(scan()->tag == RPAREN) {
+                                    Terminal* tagSon = new Terminal(scan()->tag);
+                                    son->setChild(tagSon);
+                                    move();
+                                    //nonterminal
+                                    auto blockRes = block(son);
+                                    if(!blockRes.status) {
+                                        iterator = last;
+                                        return {false, "block > " + blockRes.info};
+                                    }
+                                } else {
+                                    iterator = last;
+                                    return {false, "RPAREN"};
+                                }
+                            } else {
+                                iterator = last;
+                                return {false, "(second)altexpr > " + altexpr2Res.info};
+                            }
+                        } else {
+                            iterator = last;
+                            return {false, "SEMICON"};
+                        }
+                    } else {
+                        iterator = last;
+                        return {false, "altexpr > " + altexprRes.info};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "forinit > " + forinitRes.info};
+                }
+            } else {
+                iterator = last;
+                return {false, "LPAREN"};
+            }
+    } else {
+        iterator = last;
+        return {false, "KW_FOR"};
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::forinit(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(FORINIT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //nonterminal
+    auto localdefRes = localdef(son);
+    if(!localdefRes.status) {
+        iterator = last;
+        //nonterminal
+        auto altexprRes = altexpr(son);
+        if(altexprRes.status) {
+            //terminal
+            if(scan()->tag == SEMICON) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move(); 
+            } else {
+                //terminal
+                iterator = last;
+                son->setChild(NULL);     
+            }
+        } else {
+            //terminal
+            iterator = last;
+            son->setChild(NULL);
+        }
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::ifstat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(IFSTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_IF) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move();
+            //terminal
+            if(scan()->tag == LPAREN) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+                //nonterminal
+                auto exprRes = expr(son);
+                if(exprRes.status) {
+                    //terminal
+                    if(scan()->tag == RPAREN) {
+                        Terminal* tagSon = new Terminal(scan()->tag);
+                        son->setChild(tagSon);
+                        move();
+                        //nonterminal
+                        auto blockRes = block(son);
+                        if(blockRes.status) {
+                            //nonterminal
+                            auto elsestatRes = elsestat(son);
+                            if(!elsestatRes.status) {
+                                iterator = last;
+                                return {false, "elsestat > " + elsestatRes.info};
+                            }
+                        } else {
+                            iterator = last;
+                            return {false, "block > " + blockRes.info};
+                        }
+                    } else {
+                        iterator = last;
+                        return {false, "RPAREN"};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "expr > " + exprRes.info};
+                }
+            } else {
+                iterator = last;
+                return {false, "LPAREN"};
+            }
+    } else {
+        iterator = last;
+        return {false, "KW_IF"};
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::elsestat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(ELSESTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_ELSE) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move(); 
+        //nonterminal
+        auto blockRes = block(son);
+        if(!blockRes.status) {
+            //terminal
+            iterator = last;
+            son->setChild(NULL);      
+        }
+    } else {
+        //terminal
+        iterator = last;
+        son->setChild(NULL);     
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::switchstat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(SWITCHSTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //terminal
+    if(scan()->tag == KW_SWITCH) {
+        Terminal* tagSon = new Terminal(scan()->tag);
+        son->setChild(tagSon);
+        move();
+            //terminal
+            if(scan()->tag == LPAREN) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+                //nonterminal
+                auto exprRes = expr(son);
+                if(exprRes.status) {
+                    //terminal
+                    if(scan()->tag == RPAREN) {
+                        Terminal* tagSon = new Terminal(scan()->tag);
+                        son->setChild(tagSon);
+                        move();
+                        //terminal
+                        if(scan()->tag == LBRACE) {
+                            Terminal* tagSon = new Terminal(scan()->tag);
+                            son->setChild(tagSon);
+                            move();
+                            //nonterminal
+                            auto casestatRes = casestat(son);
+                            if(casestatRes.status) {
+                                //terminal
+                                if(scan()->tag == RBRACE) {
+                                    Terminal* tagSon = new Terminal(scan()->tag);
+                                    son->setChild(tagSon);
+                                    move();
+                                } else {
+                                    iterator = last;
+                                    return {false, "RBRACE"};
+                                }
+                            } else {
+                                iterator = last;
+                                return {false, "casestat > " + casestatRes.info};
+                            }
+                        } else {
+                            iterator = last;
+                            return {false, "LBRACE"};
+                        }
+
+                    } else {
+                        iterator = last;
+                        return {false, "RPAREN"};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "expr > " + exprRes.info};
+                }
+            } else {
+                iterator = last;
+                return {false, "LPAREN"};
+            }
+    } else {
+        iterator = last;
+        return {false, "KW_SWITCH"};
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+//switch
+matchInfo Parser::casestat(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(CASESTAT);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    switch(scan()->tag) {
+        //terminal
+        case KW_CASE: {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //nonterminal
+            auto caselabelRes = caselabel(son);
+            if(caselabelRes.status) {
+                if(scan()->tag == COLON) {
+                    auto subprogramRes = subprogram(son);
+                    if(subprogramRes.status) {
+                        auto casestatRes = casestat(son);
+                        if(!casestatRes.status) {
+                            iterator = last;
+                            return {false, "casestat > " + casestatRes.info};
+                        }
+                    } else {
+                        iterator = last;
+                        return {false, "subprogram > " + subprogramRes.info};
+                    }
+                } else {
+                    iterator = last;
+                    return {false, "COLON"};  
+                }
+            } else {
+                iterator = last;
+                return {false, "caselabel > " + caselabelRes.info};
+            }
+            break;
+        }
+        //terminal
+        case KW_DEFAULT: {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //terminal
+            if(scan()->tag == COLON) {
+                Terminal* tagSon = new Terminal(scan()->tag);
+                son->setChild(tagSon);
+                move();
+                auto subprogramRes = subprogram(son);
+                if(!subprogramRes.status) {
+                    iterator = last;
+                    return {false, "subprogram > " + subprogramRes.info};
+                }
+            } else {
+                iterator = last;
+                return {false, "COLON"};
+            }
+            break;
+        }
+        default: {
+            iterator = last;
+            return {false, "(KW_CASE | KW_DEFAULT)"};
+        }
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
+matchInfo Parser::caselabel(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(CASELABEL);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //nonterminal
+    auto literalRes = literal(son);
+    if(!literalRes.status) {
+        iterator = last;
+        return {false, "literal > " + literalRes.info}; 
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}

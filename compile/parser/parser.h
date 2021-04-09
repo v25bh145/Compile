@@ -82,7 +82,7 @@ class Parser {
         matchInfo switchstat(Nonterminal* father);
         matchInfo dowhilestat(Nonterminal* father);
         matchInfo ifstat(Nonterminal* father);
-        matchInfo forint(Nonterminal* father);
+        matchInfo forinit(Nonterminal* father);
         matchInfo elsestat(Nonterminal* father);
         matchInfo casestat(Nonterminal* father);
         matchInfo caselabel(Nonterminal* father);
