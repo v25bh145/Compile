@@ -30,8 +30,9 @@ enum NonterminalType{
     WHILESTAT, FORSTAT, DOWHILESTAT, 
     IFSTAT, SWITCHSTAT, 
     FORINIT, ELSESTAT, CASESTAT, 
-    CASELABEL
+    CASELABEL, ROOT
 };
+string NonterminalMap[100];
 class ParserSign {
     public:
         bool isTerminal;
@@ -58,6 +59,9 @@ class Nonterminal: public ParserSign {
         list<ParserSign*> getChild() {
             return this->children;
         }
+        string toString() {
+            return NonterminalMap[type];
+        }
 };
 class Terminal: public ParserSign {
     private:
@@ -72,6 +76,9 @@ class Terminal: public ParserSign {
         }
         Tag getType() {
             return this->type;
+        }
+        string toString() {
+            return TagMap[type];
         }
 };
 

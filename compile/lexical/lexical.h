@@ -25,7 +25,7 @@ enum Tag{
     KW_WHILE, KW_DO, KW_FOR, 
     KW_BREAK, KW_CONTINUE, KW_RETURN
 };
-
+string TagMap[48];
 class Token {
     public:
         Tag tag;

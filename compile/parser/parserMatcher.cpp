@@ -371,6 +371,23 @@ matchInfo Parser::expr(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+matchInfo Parser::altexpr(Nonterminal* father) {
+    //创建本层节点
+    Nonterminal* son = new Nonterminal(ALTEXPR);
+    //创建历史纪录，以便出现匹配失败时回溯到匹配前
+    list<Token*>::iterator last = iterator;
+
+    //nonterminal
+    auto exprRes = expr(son);
+    if(!exprRes.status) {
+        iterator = last;
+        son->setChild(NULL);
+    }
+
+    //匹配成功，装载节点
+    father->setChild(son);
+    return {true, ""};
+}
 matchInfo Parser::defdata(Nonterminal* father) {
     //创建本层节点
     Nonterminal* son = new Nonterminal(DEFDATA);

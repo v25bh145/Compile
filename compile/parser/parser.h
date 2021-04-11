@@ -14,22 +14,14 @@ struct matchInfo {
 
 class Parser {
     private:
-        vector<ParserSign*> parserList;
+        Nonterminal *parserRoot;
         list<Token*> tokenList;
         list<Token*>::iterator iterator;
         //use only by matcher
         Token* move();
         Token* scan();
-    public:
-        Parser(list<Token*> tokenList) {
-            this->tokenList = tokenList;
-            this->iterator = tokenList.begin();
-        }
-
-        vector<ParserSign*> run();
-
-        void test();
-
+        void initNonterminalMap();
+        //in parserMatcher.cpp
         matchInfo program(Nonterminal* father);
         matchInfo segment(Nonterminal* father);
         matchInfo type(Nonterminal* father);
@@ -86,6 +78,18 @@ class Parser {
         matchInfo elsestat(Nonterminal* father);
         matchInfo casestat(Nonterminal* father);
         matchInfo caselabel(Nonterminal* father);
+    public:
+        Parser(list<Token*> tokenList) {
+            this->tokenList = tokenList;
+            this->iterator = tokenList.begin();
+            parserRoot = new Nonterminal(ROOT);
+            initNonterminalMap();
+        }
+        //in parserMain.cpp
+        Nonterminal *run();
+        void Parser::print(ParserSign* node);
+        void test();
+
 };
 
 #endif

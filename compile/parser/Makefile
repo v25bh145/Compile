@@ -1,5 +1,5 @@
 cc = g++
-parserObject = parserMatcher.o parserScanner.o
+parserObject = parserMatcher.o parserScanner.o nonterminalMap.o
 parserPath = $(PWD)/compile/parser
 
 parserMain.o: $(parserObject)
@@ -10,3 +10,6 @@ parserMatcher.o:
 
 parserScanner.o:
 	$(cc) -c $(parserPath)/parserScanner.cpp
+
+nonterminalMap.o
+	$(cc) -c $(parserPath)/nonterminalMap.cpp
