@@ -16,11 +16,10 @@ class Parser {
     private:
         Nonterminal *parserRoot;
         list<Token*> tokenList;
-        list<Token*>::iterator iterator;
+        list<Token*>::iterator tokenIterator;
         //use only by matcher
-        Token* move();
+        bool move();
         Token* scan();
-        void initNonterminalMap();
         //in parserMatcher.cpp
         matchInfo program(Nonterminal* father);
         matchInfo segment(Nonterminal* father);
@@ -81,15 +80,14 @@ class Parser {
     public:
         Parser(list<Token*> tokenList) {
             this->tokenList = tokenList;
-            this->iterator = tokenList.begin();
+            this->tokenIterator = this->tokenList.begin();
             parserRoot = new Nonterminal(ROOT);
             initNonterminalMap();
         }
         //in parserMain.cpp
         Nonterminal *run();
-        void Parser::print(ParserSign* node);
+        int print(ParserSign* node, int stack);
         void test();
-
 };
 
 #endif

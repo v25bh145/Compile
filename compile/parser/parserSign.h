@@ -5,7 +5,8 @@
 #define PARSERSIGN_H
 #include "../lexical/lexical.h"
 using namespace std;
-
+void initNonterminalMap();
+string getNonterminalMap(int i);
 enum NonterminalType{
     PROGRAM, SEGMENT, 
     TYPE, DEF, 
@@ -32,10 +33,10 @@ enum NonterminalType{
     FORINIT, ELSESTAT, CASESTAT, 
     CASELABEL, ROOT
 };
-string NonterminalMap[100];
 class ParserSign {
     public:
         bool isTerminal;
+        string toString();
 };
 class Nonterminal: public ParserSign {
     private:
@@ -56,11 +57,11 @@ class Nonterminal: public ParserSign {
         void setChild(ParserSign* child) {
             this->children.push_back(child);
         }
-        list<ParserSign*> getChild() {
+        list<ParserSign*> getChildren() {
             return this->children;
         }
         string toString() {
-            return NonterminalMap[type];
+            return getNonterminalMap(type);
         }
 };
 class Terminal: public ParserSign {
@@ -78,7 +79,7 @@ class Terminal: public ParserSign {
             return this->type;
         }
         string toString() {
-            return TagMap[type];
+            return getTagMap(type);
         }
 };
 

@@ -8,29 +8,9 @@ using namespace std;
 list<Token*> tokenList;
 // Token* t;
 Keywords keywords = Keywords();
-string TagMap[48] = {
-    "ERR", "END", 
-    "ID", 
-    "KW_INT", "KW_CHAR", "KW_VOID",
-    "KW_EXTERN", 
-    "NUM", "CH", "STR", 
-    "NOT", "LEA", 
-    "ADD", "SUB", "MUL", "DIV", "MOD", 
-    "INC", "DEC", 
-    "GT", "GE", "LT", "LE", "EQU", "NEQU", 
-    "AND", "OR", 
-    "LPAREN", "RPAREN",     
-    "LBRACK", "RBRACK", 
-    "LBRACE", "RBRACE", 
-    "COMMA", "COLON", "SEMICON", 
-    "ASSIGN", 
-    "KW_IF", "KW_ELSE", 
-    "KW_SWITCH", "KW_CASE", "KW_DEFAULT", 
-    "KW_WHILE", "KW_DO", "KW_FOR", 
-    "KW_BREAK", "KW_CONTINUE", "KW_RETURN"
-};
 
 list<Token*> lexical_analyze() {
+    initTagMap();
     char ch = scan();
     while(ch != -1) {
         if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_')
@@ -49,5 +29,60 @@ list<Token*> lexical_analyze() {
 }
 
 string Token::toString() {
-    return "tag:" + string(TagMap[tag]);
+    return "tag:" + getTagMap(tag);
+}
+string *TagMap;
+void initTagMap() {
+    TagMap = new string[50];
+    TagMap[ERR] = "ERR";
+    TagMap[END] = "END";
+    TagMap[ID] = "ID";
+    TagMap[KW_INT] = "KW_INT";
+    TagMap[KW_CHAR] = "KW_CHAR";
+    TagMap[KW_VOID] = "KW_VOID";
+    TagMap[KW_EXTERN] = "KW_EXTERN";
+    TagMap[NUM] = "NUM";
+    TagMap[CH] = "CH";
+    TagMap[STR] = "STR";
+    TagMap[NOT] = "NOT";
+    TagMap[LEA] = "LEA";
+    TagMap[ADD] = "ADD";
+    TagMap[SUB] = "SUB";
+    TagMap[MUL] = "MUL";
+    TagMap[DIV] = "DIV";
+    TagMap[MOD] = "MOD";
+    TagMap[INC] = "INC";
+    TagMap[DEC] = "DEC";
+    TagMap[GT] = "GT";
+    TagMap[GE] = "GE";
+    TagMap[LT] = "LT";
+    TagMap[LE] = "LE";
+    TagMap[EQU] = "EQU";
+    TagMap[NEQU] = "NEQU";
+    TagMap[AND] = "AND";
+    TagMap[OR] = "OR";
+    TagMap[LPAREN] = "LPAREN";
+    TagMap[RPAREN] = "RPAREN";
+    TagMap[LBRACK] = "LBRACK";
+    TagMap[RBRACK] = "RBRACK";
+    TagMap[LBRACE] = "LBRACE";
+    TagMap[RBRACE] = "RBRACE";
+    TagMap[COMMA] = "COMMA";
+    TagMap[COLON] = "COLON";
+    TagMap[SEMICON] = "SEMICON";
+    TagMap[ASSIGN] = "ASSIGN";
+    TagMap[KW_IF] = "KW_IF";
+    TagMap[KW_ELSE] = "KW_ELSE";
+    TagMap[KW_SWITCH] = "KW_SWITCH";
+    TagMap[KW_CASE] = "KW_CASE";
+    TagMap[KW_DEFAULT] = "KW_DEFAULT";
+    TagMap[KW_WHILE] = "KW_WHILE";
+    TagMap[KW_DO] = "KW_DO";
+    TagMap[KW_FOR] = "KW_FOR";
+    TagMap[KW_BREAK] = "KW_BREAK";
+    TagMap[KW_CONTINUE] = "KW_CONTINUE";
+    TagMap[KW_RETURN] = "KW_RETURN";
+}
+string getTagMap(int i) {
+    return TagMap[i];
 }

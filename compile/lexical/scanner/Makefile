@@ -1,4 +1,4 @@
 cc = g++
 
-scanner.o:
+scanner.o: $(PWD)/compile/lexical/scanner/scanner.cpp
 	$(cc) -c $(PWD)/compile/lexical/scanner/scanner.cpp

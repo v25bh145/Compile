@@ -3,10 +3,14 @@
  **/
 #include "parser.h"
 using namespace std;
-Token* Parser::move() {
-    iterator++;
-    return *iterator;
+bool Parser::move() { 
+    tokenIterator++;
+    // cout<<"    MOVE    "<<(tokenIterator == this->tokenList.end())<<endl;
+    if(tokenIterator == this->tokenList.end()) return false;
+    return true;
 }
 Token* Parser::scan() {
-    return *iterator;
+    if(tokenIterator == this->tokenList.end()) return NULL;
+    // cout<<"SCAN "<<(*tokenIterator)->toString()<<endl;
+    return *tokenIterator;
 }

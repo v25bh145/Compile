@@ -55,7 +55,7 @@ char ConstNum(char ch, list<Token*>* tokenList) {
             } while(ch >= '0' && ch <= '7');
         } else {
             //0
-            ch = scan();
+            // ch = scan();
         }
     }
     tokenList->push_back(new Num(val));

@@ -21,6 +21,5 @@ int COMPILE(char* filePath) {
 
     Parser* parser = new Parser(tokenList);
     Nonterminal *root = parser->run();
-
-    
+    parser->print(root, 0);
 }

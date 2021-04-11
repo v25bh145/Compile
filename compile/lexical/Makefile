@@ -5,5 +5,5 @@ include $(PWD)/compile/lexical/scanner/Makefile
 cc = g++
 lexicalObject = scanner.o errorHandler.o $(hardCodeObject)
 
-lexical.o: $(lexicalObject)
+lexical.o: $(lexicalObject) $(PWD)/compile/lexical/lexical.cpp
 	$(cc) -c $(PWD)/compile/lexical/lexical.cpp

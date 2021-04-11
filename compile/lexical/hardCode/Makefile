@@ -1,21 +1,22 @@
 cc = g++
 hardCodeCpp = bound.cpp constStr.cpp constChar.cpp constNum.cpp null.cpp sign.cpp
 hardCodeObject = bound.o constStr.o constChar.o constNum.o null.o sign.o
+hardCodePath = $(PWD)/compile/lexical/hardCode
 
-constChar.o: $(PWD)/compile/lexical/hardCode/constChar.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/constChar.cpp
+constChar.o: $(hardCodePath)/constChar.cpp
+	$(cc) -c $(hardCodePath)/constChar.cpp
 
-constStr.o: $(PWD)/compile/lexical/hardCode/constStr.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/constStr.cpp
+constStr.o: $(hardCodePath)/constStr.cpp
+	$(cc) -c $(hardCodePath)/constStr.cpp
 
-constNum.o: $(PWD)/compile/lexical/hardCode/constNum.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/constNum.cpp
+constNum.o: $(hardCodePath)/constNum.cpp
+	$(cc) -c $(hardCodePath)/constNum.cpp
 
-null.o: $(PWD)/compile/lexical/hardCode/null.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/null.cpp
+null.o: $(hardCodePath)/null.cpp
+	$(cc) -c $(hardCodePath)/null.cpp
 
-sign.o: $(PWD)/compile/lexical/hardCode/sign.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/sign.cpp
+sign.o: $(hardCodePath)/sign.cpp
+	$(cc) -c $(hardCodePath)/sign.cpp
 
-bound.o: $(PWD)/compile/lexical/hardCode/bound.cpp
-	$(cc) -c $(PWD)/compile/lexical/hardCode/bound.cpp
+bound.o: $(hardCodePath)/bound.cpp
+	$(cc) -c $(hardCodePath)/bound.cpp

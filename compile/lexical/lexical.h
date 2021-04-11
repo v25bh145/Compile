@@ -25,7 +25,8 @@ enum Tag{
     KW_WHILE, KW_DO, KW_FOR, 
     KW_BREAK, KW_CONTINUE, KW_RETURN
 };
-string TagMap[48];
+void initTagMap();
+string getTagMap(int i);
 class Token {
     public:
         Tag tag;
@@ -41,6 +42,7 @@ class Id: public Token {
         string name;
         Id(string n) {
             this->name = n;
+            this->tag = ID;
         }
         virtual string toString() {
             return "id:" + name;
@@ -52,6 +54,7 @@ class Num: public Token {
         int val;
         Num(int v) {
             this->val = v;
+            this->tag = NUM;
         }
         virtual string toString() {
             return "num:" + to_string(val);
@@ -63,6 +66,7 @@ class Char: public Token {
         char ch;
         Char(char c) {
             this->ch = c;
+            this->tag = CH;
         }
         virtual string toString() {
             string s = "char:";
@@ -76,6 +80,7 @@ class Str: public Token {
         string str;
         Str(string s) {
             this->str = s;
+            this->tag = STR;
         }
         virtual string toString() {
             return "str:" + str;

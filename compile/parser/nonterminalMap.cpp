@@ -1,5 +1,10 @@
-#include "parser.h";
-void Parser::initNonterminalMap() {
+#include "parser.h"
+string* NonterminalMap;
+string getNonterminalMap(int i) {
+    return NonterminalMap[i];
+}
+void initNonterminalMap() {
+    NonterminalMap = new string[60];
     NonterminalMap[PROGRAM] = "PROGRAM";
     NonterminalMap[SEGMENT] = "SEGMENT";
     NonterminalMap[TYPE] = "TYPE";
