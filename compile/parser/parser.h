@@ -17,7 +17,7 @@ class Parser {
         Nonterminal *parserRoot;
         list<Token*> tokenList;
         list<Token*>::iterator tokenIterator;
-        //use only by matcher
+        //in parserScanner.cpp, is used in parserMatcher.cpp
         bool move();
         Token* scan();
         //in parserMatcher.cpp
@@ -87,7 +87,6 @@ class Parser {
         //in parserMain.cpp
         Nonterminal *run();
         int print(ParserSign* node, int stack);
-        void test();
 };
 
 #endif

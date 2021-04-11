@@ -17,10 +17,9 @@ matchInfo Parser::program(Nonterminal* father) {
 
     //terminal
     auto segmentRes = segment(son);
-    if(segmentRes.status == false) {
+    if(!segmentRes.status) {
         tokenIterator = last;
         cout<<"false "<<segmentRes.info<<endl;
-        
     }
     else program(son);
 

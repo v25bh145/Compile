@@ -36,8 +36,8 @@ enum NonterminalType{
 class ParserSign {
     public:
         bool isTerminal;
-        string toString();
 };
+//非终结符
 class Nonterminal: public ParserSign {
     private:
         NonterminalType type;
@@ -64,6 +64,7 @@ class Nonterminal: public ParserSign {
             return getNonterminalMap(type);
         }
 };
+//终结符
 class Terminal: public ParserSign {
     private:
         Tag type;
