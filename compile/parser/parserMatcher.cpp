@@ -631,9 +631,9 @@ matchInfo Parser::block(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    symTab.enter();
     //terminal
     if(scan()->tag == LBRACE) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -653,11 +653,11 @@ matchInfo Parser::block(Nonterminal* father) {
             tokenIterator = last;
             return {false, "subprogram > " + subprogramRes.info}; 
         }
+        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "LBRACE"};
     }
-    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1690,10 +1690,10 @@ matchInfo Parser::whilestat(Nonterminal* father) {
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
-
-    symTab.enter();
+    
     //terminal
     if(scan()->tag == KW_WHILE) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1728,11 +1728,11 @@ matchInfo Parser::whilestat(Nonterminal* father) {
             tokenIterator = last;
             return {false, "LPAREN"};
         }
+        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "KW_WHILE"};
     }
-    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1822,71 +1822,73 @@ matchInfo Parser::forstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    symTab.enter();
+    
     //terminal
     if(scan()->tag == KW_FOR) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
-            //terminal
-            if(scan()->tag == LPAREN) {
-                Terminal* tagSon = new Terminal(scan()->tag);
-                son->setChild(tagSon);
-                move();
+        //terminal
+        if(scan()->tag == LPAREN) {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //nonterminal
+            auto forinitRes = forinit(son);
+            if(forinitRes.status) {
                 //nonterminal
-                auto forinitRes = forinit(son);
-                if(forinitRes.status) {
-                    //nonterminal
-                    auto altexprRes = altexpr(son);
-                    if(altexprRes.status) {
-                        //terminal
-                        if(scan()->tag == SEMICON) {
-                            Terminal* tagSon = new Terminal(scan()->tag);
-                            son->setChild(tagSon);
-                            move();
-                            //nonterminal
-                            auto altexpr2Res = altexpr(son);
-                            if(altexpr2Res.status) {
-                                //terminal
-                                if(scan()->tag == RPAREN) {
-                                    Terminal* tagSon = new Terminal(scan()->tag);
-                                    son->setChild(tagSon);
-                                    move();
-                                    //nonterminal
-                                    auto blockRes = block(son);
-                                    if(!blockRes.status) {
-                                        tokenIterator = last;
-                                        return {false, "block > " + blockRes.info};
-                                    }
-                                } else {
+                auto altexprRes = altexpr(son);
+                if(altexprRes.status) {
+                    //terminal
+                    if(scan()->tag == SEMICON) {
+                        Terminal* tagSon = new Terminal(scan()->tag);
+                        son->setChild(tagSon);
+                        move();
+                        //nonterminal
+                        auto altexpr2Res = altexpr(son);
+                        if(altexpr2Res.status) {
+                            //terminal
+                            if(scan()->tag == RPAREN) {
+                                Terminal* tagSon = new Terminal(scan()->tag);
+                                son->setChild(tagSon);
+                                move();
+                                //nonterminal
+                                auto blockRes = block(son);
+                                if(!blockRes.status) {
                                     tokenIterator = last;
-                                    return {false, "RPAREN"};
+                                    return {false, "block > " + blockRes.info};
                                 }
                             } else {
                                 tokenIterator = last;
-                                return {false, "(second)altexpr > " + altexpr2Res.info};
+                                return {false, "RPAREN"};
                             }
                         } else {
                             tokenIterator = last;
-                            return {false, "SEMICON"};
+                            return {false, "(second)altexpr > " + altexpr2Res.info};
                         }
                     } else {
                         tokenIterator = last;
-                        return {false, "altexpr > " + altexprRes.info};
+                        return {false, "SEMICON"};
                     }
                 } else {
                     tokenIterator = last;
-                    return {false, "forinit > " + forinitRes.info};
+                    return {false, "altexpr > " + altexprRes.info};
                 }
             } else {
                 tokenIterator = last;
-                return {false, "LPAREN"};
+                return {false, "forinit > " + forinitRes.info};
             }
+        } else {
+            tokenIterator = last;
+            return {false, "LPAREN"};
+        }
+        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "KW_FOR"};
     }
-    symTab.leave();
+    
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1938,9 +1940,9 @@ matchInfo Parser::ifstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    symTab.enter();
     //terminal
     if(scan()->tag == KW_IF) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1982,11 +1984,11 @@ matchInfo Parser::ifstat(Nonterminal* father) {
                 tokenIterator = last;
                 return {false, "LPAREN"};
             }
+        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "KW_IF"};
     }
-    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -2001,9 +2003,9 @@ matchInfo Parser::elsestat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    symTab.enter();
     //terminal
     if(scan()->tag == KW_ELSE) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move(); 
@@ -2012,14 +2014,13 @@ matchInfo Parser::elsestat(Nonterminal* father) {
         if(!blockRes.status) {
             //terminal
             tokenIterator = last;
-                  
         }
+        symTab.leave();
     } else {
         //terminal
         tokenIterator = last;
              
     }
-    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -2034,68 +2035,68 @@ matchInfo Parser::switchstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    symTab.enter();
     //terminal
     if(scan()->tag == KW_SWITCH) {
+        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
-            //terminal
-            if(scan()->tag == LPAREN) {
-                Terminal* tagSon = new Terminal(scan()->tag);
-                son->setChild(tagSon);
-                move();
-                //nonterminal
-                auto exprRes = expr(son);
-                if(exprRes.status) {
+        //terminal
+        if(scan()->tag == LPAREN) {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //nonterminal
+            auto exprRes = expr(son);
+            if(exprRes.status) {
+                //terminal
+                if(scan()->tag == RPAREN) {
+                    Terminal* tagSon = new Terminal(scan()->tag);
+                    son->setChild(tagSon);
+                    move();
                     //terminal
-                    if(scan()->tag == RPAREN) {
+                    if(scan()->tag == LBRACE) {
                         Terminal* tagSon = new Terminal(scan()->tag);
                         son->setChild(tagSon);
                         move();
-                        //terminal
-                        if(scan()->tag == LBRACE) {
-                            Terminal* tagSon = new Terminal(scan()->tag);
-                            son->setChild(tagSon);
-                            move();
-                            //nonterminal
-                            auto casestatRes = casestat(son);
-                            if(casestatRes.status) {
-                                //terminal
-                                if(scan()->tag == RBRACE) {
-                                    Terminal* tagSon = new Terminal(scan()->tag);
-                                    son->setChild(tagSon);
-                                    move();
-                                } else {
-                                    tokenIterator = last;
-                                    return {false, "RBRACE"};
-                                }
+                        //nonterminal
+                        auto casestatRes = casestat(son);
+                        if(casestatRes.status) {
+                            //terminal
+                            if(scan()->tag == RBRACE) {
+                                Terminal* tagSon = new Terminal(scan()->tag);
+                                son->setChild(tagSon);
+                                move();
                             } else {
                                 tokenIterator = last;
-                                return {false, "casestat > " + casestatRes.info};
+                                return {false, "RBRACE"};
                             }
                         } else {
                             tokenIterator = last;
-                            return {false, "LBRACE"};
+                            return {false, "casestat > " + casestatRes.info};
                         }
-
                     } else {
                         tokenIterator = last;
-                        return {false, "RPAREN"};
+                        return {false, "LBRACE"};
                     }
+
                 } else {
                     tokenIterator = last;
-                    return {false, "expr > " + exprRes.info};
+                    return {false, "RPAREN"};
                 }
             } else {
                 tokenIterator = last;
-                return {false, "LPAREN"};
+                return {false, "expr > " + exprRes.info};
             }
+        } else {
+            tokenIterator = last;
+            return {false, "LPAREN"};
+        }
+        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "KW_SWITCH"};
     }
-    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
