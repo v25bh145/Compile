@@ -1,7 +1,7 @@
 /**
  * 用于匹配非终结符/终结符
  * symTab装载:
- *  block
+ *  //block (duplicated)
  *  for
  *  while
  *  dowhile
@@ -633,7 +633,6 @@ matchInfo Parser::block(Nonterminal* father) {
 
     //terminal
     if(scan()->tag == LBRACE) {
-        symTab.enter();
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -653,7 +652,6 @@ matchInfo Parser::block(Nonterminal* father) {
             tokenIterator = last;
             return {false, "subprogram > " + subprogramRes.info}; 
         }
-        symTab.leave();
     } else {
         tokenIterator = last;
         return {false, "LBRACE"};

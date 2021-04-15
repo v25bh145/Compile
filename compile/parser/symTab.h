@@ -95,5 +95,6 @@ class Fun {
         InterInst *returnPoint;
         */
     void enterScope();
+    void leaveScope();
 };
 #endif
