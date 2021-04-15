@@ -1,5 +1,14 @@
 /**
  * 用于匹配非终结符/终结符
+ * symTab装载:
+ *  block
+ *  while
+ *  dowhile
+ *  for
+ *  if
+ *  else
+ *  switch
+ *  idtail
  **/
 #include "parser.h"
 #include "parserSign.h"
@@ -169,6 +178,7 @@ matchInfo Parser::idtail(Nonterminal* father) {
     if(secondFlag) {
        //terminal
         if(scan()->tag == LPAREN) {
+            symTab.enter();
             Terminal* tagSon = new Terminal(scan()->tag);
             son->setChild(tagSon);
             move();
@@ -196,6 +206,7 @@ matchInfo Parser::idtail(Nonterminal* father) {
                 tokenIterator = last;
                 return {false, "para > " + paraRes.info};
             }
+            symTab.leave();
         } else {
             tokenIterator = last;
             return {false, "(varrdef | LRAREN) > " + varrdefRes.info};
@@ -620,6 +631,7 @@ matchInfo Parser::block(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == LBRACE) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -645,6 +657,7 @@ matchInfo Parser::block(Nonterminal* father) {
         tokenIterator = last;
         return {false, "LBRACE"};
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1678,6 +1691,7 @@ matchInfo Parser::whilestat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_WHILE) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1718,6 +1732,7 @@ matchInfo Parser::whilestat(Nonterminal* father) {
         tokenIterator = last;
         return {false, "KW_WHILE"};
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1732,6 +1747,7 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_DO) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1750,6 +1766,7 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
                     Terminal* tagSon = new Terminal(scan()->tag);
                     son->setChild(tagSon);
                     move();
+                    symTab.leave();
                     //nonterminal
                     auto altexprRes = altexpr(son);
                     if(altexprRes.status) {
@@ -1805,6 +1822,7 @@ matchInfo Parser::forstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_FOR) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1868,6 +1886,7 @@ matchInfo Parser::forstat(Nonterminal* father) {
         tokenIterator = last;
         return {false, "KW_FOR"};
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1919,6 +1938,7 @@ matchInfo Parser::ifstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_IF) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1966,6 +1986,7 @@ matchInfo Parser::ifstat(Nonterminal* father) {
         tokenIterator = last;
         return {false, "KW_IF"};
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -1980,6 +2001,7 @@ matchInfo Parser::elsestat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_ELSE) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1997,6 +2019,7 @@ matchInfo Parser::elsestat(Nonterminal* father) {
         tokenIterator = last;
              
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
@@ -2011,6 +2034,7 @@ matchInfo Parser::switchstat(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    symTab.enter();
     //terminal
     if(scan()->tag == KW_SWITCH) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -2071,6 +2095,7 @@ matchInfo Parser::switchstat(Nonterminal* father) {
         tokenIterator = last;
         return {false, "KW_SWITCH"};
     }
+    symTab.leave();
 
     //匹配成功，装载节点
     father->setChild(son);
