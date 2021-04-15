@@ -25,6 +25,7 @@ list<Token*> lexical_analyze() {
             ch = Null(ch, &tokenList);
         else ch = Bound(ch, &tokenList);
     }
+    tokenList.push_back(new Token(END));
     return tokenList;
 }
 

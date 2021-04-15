@@ -2,6 +2,6 @@
 #define COMPILEAPI_H
 using namespace std;
 
-int COMPILE(char* filePath);
+int Compile(char* filePath);
 
 #endif

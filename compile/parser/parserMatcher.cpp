@@ -7,8 +7,8 @@ using namespace std;
 
 //将本层的节点装载到上层，搜索下层的子节点并在下层装配至此层节点中
 matchInfo Parser::program(Nonterminal* father) {
-    //如果词记号到头，则直接返回
-    if(scan() == NULL) return {true, "over"};  
+    // //如果词记号到头，则直接返回
+    // if(scan() == NULL) return {true, "over"};  
     //创建本层节点
     Nonterminal* son = new Nonterminal(PROGRAM);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
@@ -19,7 +19,13 @@ matchInfo Parser::program(Nonterminal* father) {
     auto segmentRes = segment(son);
     if(!segmentRes.status) {
         tokenIterator = last;
-        cout<<"false "<<segmentRes.info<<endl;
+        if(scan()->tag == END) {
+            // cout<<"over"<<endl;
+        }
+        else {
+            // cout<<"false "<<segmentRes.info<<endl;
+            return {false, "segment > " + segmentRes.info};
+        }
     }
     else program(son);
 
@@ -1483,7 +1489,7 @@ matchInfo Parser::subprogram(Nonterminal* father) {
             secondFlag = true;
         }
     } else {
-        tokenIterator = last; cout<<"back"<<endl;
+        tokenIterator = last;
         secondFlag = true;
     }
     if(secondFlag) {

@@ -10,10 +10,12 @@
 #include "parser/parser.h"
 using namespace std;
 
-int COMPILE(char* filePath) {
+int Compile(char* filePath) {
     list<Token*> tokenList;
     if(readFile(filePath) < 0) return -1;
     tokenList = lexical_analyze();
+
+    cout<<"======词法分析======"<<endl;
 
     for(auto p = tokenList.begin(); p != tokenList.end(); p++) {
         printf("%s\n", (*p)->toString().c_str());
@@ -21,5 +23,7 @@ int COMPILE(char* filePath) {
 
     Parser* parser = new Parser(tokenList);
     Nonterminal *root = parser->run();
+
+    cout<<"======词法数分析======"<<endl;
     parser->print(root, 0);
 }
