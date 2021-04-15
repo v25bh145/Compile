@@ -5,6 +5,7 @@
 #include <vector>
 #include "parserSign.h"
 #include "../lexical/lexical.h"
+#include "./symTab.h";
 using namespace std;
 
 struct matchInfo {
@@ -17,6 +18,7 @@ class Parser {
         Nonterminal *parserRoot;
         list<Token*> tokenList;
         list<Token*>::iterator tokenIterator;
+        SymTab symTab;
         //in parserScanner.cpp, is used in parserMatcher.cpp
         bool move();
         Token* scan();
@@ -83,6 +85,7 @@ class Parser {
             this->tokenIterator = this->tokenList.begin();
             parserRoot = new Nonterminal(ROOT);
             initNonterminalMap();
+            this->symTab = SymTab();
         }
         //in parserMain.cpp
         Nonterminal *run();
