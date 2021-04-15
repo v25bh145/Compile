@@ -2,9 +2,9 @@
  * 用于匹配非终结符/终结符
  * symTab装载:
  *  block
+ *  for
  *  while
  *  dowhile
- *  for
  *  if
  *  else
  *  switch
