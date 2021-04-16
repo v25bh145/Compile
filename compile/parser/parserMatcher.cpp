@@ -1,5 +1,7 @@
 /**
  * 用于匹配非终结符/终结符
+ **/
+/** 
  * symTab装载:
  *  //block (duplicated)
  *  for
@@ -10,6 +12,19 @@
  *  switch
  *  idtail
  **/
+/**
+ * 变量定义:
+ * 语段 参数 返回 创建变量
+ * <segment> / /
+ * <type> / tag : Tag
+ * <def> (bool isExtern, Tag tag) / 
+ * <idtail> (bool isExtern, Tag tag, string ID) /
+ * <varrdef> (bool isExtern, Tag tag, string ID, bool isPoint) / Y
+ * <deflist> (bool isExtern, Tag tag) /
+ * <defdata> (bool isExtern, Tag tag) / 
+ * <init> (bool isExtern, Tag tag, string ID, bool isPoint) / / Y
+ **/
+//TODO: <expr>
 #include "parser.h"
 #include "parserSign.h"
 using namespace std;
@@ -51,7 +66,9 @@ matchInfo Parser::segment(Nonterminal* father) {
     //cout<<son->toString()<<endl;
 
     //terminal
+    bool isExtern = false;
     if(scan()->tag == KW_EXTERN) {
+        isExtern = true;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -63,7 +80,7 @@ matchInfo Parser::segment(Nonterminal* father) {
         return {false, "type > " + typeRes.info}; 
     }
     //nonterminal
-    auto defRes = def(son);
+    auto defRes = def(son, isExtern, typeRes.tag);
     if(defRes.status == false){ 
         tokenIterator = last; 
         return {false, "def > " + defRes.info};
@@ -73,6 +90,7 @@ matchInfo Parser::segment(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+//return Tag
 matchInfo Parser::type(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -82,20 +100,24 @@ matchInfo Parser::type(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    Tag tag;
     //terminal
     if(scan()->tag == KW_INT || scan()->tag == KW_VOID || scan()->tag == KW_CHAR) {
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
+        tag = scan()->tag;
     } else {
         tokenIterator = last;
         return {false, "(KW_INT | KW_VOID | KW_CHAR)"};
     }
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    matchInfo res;
+    res.info = "";res.status = true;res.tag = tag;
+    return res;
 }
-matchInfo Parser::def(Nonterminal* father) {
+matchInfo Parser::def(Nonterminal* father, bool isExtern, Tag tag) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -105,12 +127,14 @@ matchInfo Parser::def(Nonterminal* father) {
     //cout<<son->toString()<<endl;
 
     //terminal
+    string id;
     if(scan()->tag == ID) {
+        id = ((Id*)scan())->name;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
         //nonterminal
-        auto idtailRes = idtail(son);
+        auto idtailRes = idtail(son, isExtern, tag, id);
         if(idtailRes.status == false) {
             tokenIterator = last; 
             return {false, "idtail > " + idtailRes.info};
@@ -122,17 +146,18 @@ matchInfo Parser::def(Nonterminal* father) {
         move();
         //terminal
         if(scan()->tag == ID) {
+            id = ((Id*)scan())->name;
             Terminal* tagSon = new Terminal(scan()->tag);
             son->setChild(tagSon);
             move();
             //nonterminal
-            auto initRes = init(son);
+            auto initRes = init(son, isExtern, tag, id, true);
             if(initRes.status == false) {
                 tokenIterator = last; 
                 return {false, "init > " + initRes.info};
             }
             //nonterminal
-            auto deflistRes = deflist(son);
+            auto deflistRes = deflist(son, isExtern, tag);
             if(deflistRes.status == false) {
                 tokenIterator = last; 
                 return {false, "deflist > " + deflistRes.info};
@@ -151,7 +176,7 @@ matchInfo Parser::def(Nonterminal* father) {
     return {true, ""};
 }
 //fixed
-matchInfo Parser::idtail(Nonterminal* father) {
+matchInfo Parser::idtail(Nonterminal* father, bool isExtern, Tag tag, string id) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -161,7 +186,7 @@ matchInfo Parser::idtail(Nonterminal* father) {
     //cout<<son->toString()<<endl;
 
     bool secondFlag = false;
-    auto varrdefRes = varrdef(son);
+    auto varrdefRes = varrdef(son, isExtern, tag, id);
     //nonterminal
     if(!varrdefRes.status) {
         //back
@@ -169,7 +194,7 @@ matchInfo Parser::idtail(Nonterminal* father) {
         secondFlag = true;
     //nonterminal
     } else {
-        auto deflistRes = deflist(son);
+        auto deflistRes = deflist(son, isExtern, tag);
         if(deflistRes.status == false) {
             tokenIterator = last;
             secondFlag = true;
@@ -217,7 +242,7 @@ matchInfo Parser::idtail(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::init(Nonterminal* father) {
+matchInfo Parser::init(Nonterminal* father, bool isExtern, Tag tag, string id, bool isPoint) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -237,6 +262,10 @@ matchInfo Parser::init(Nonterminal* father) {
             //terminal
             tokenIterator = last;
             
+        } else {
+            //create var
+            Var* var = new Var(symTab.scopePath, isExtern, tag, isPoint, id, exprRes.var);
+            symTab.addVar(var);
         }
     } else {
         //terminal
@@ -248,7 +277,7 @@ matchInfo Parser::init(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::deflist(Nonterminal* father) {
+matchInfo Parser::deflist(Nonterminal* father, bool isExtern, Tag tag) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -263,13 +292,13 @@ matchInfo Parser::deflist(Nonterminal* father) {
         son->setChild(tagSon);
         move();
         //nonterminal
-        auto defdataRes = defdata(son);
+        auto defdataRes = defdata(son, isExtern, tag);
         if(!defdataRes.status) {
             tokenIterator = last;
             return {false, "defdata > " + defdataRes.info};
         } else {
             //nonterminal
-            auto deflistRes = deflist(son);
+            auto deflistRes = deflist(son, isExtern, tag);
             if(!deflistRes.status) {
                 tokenIterator = last;
                 return {false, "deflist > " + deflistRes.info};
@@ -292,7 +321,7 @@ matchInfo Parser::deflist(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::varrdef(Nonterminal* father) {
+matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -307,7 +336,9 @@ matchInfo Parser::varrdef(Nonterminal* father) {
         son->setChild(tagSon);
         move();
         //terminal
+        int num;
         if(scan()->tag == NUM) {
+            num = ((Num*)scan())->val;
             Terminal* tagSon = new Terminal(scan()->tag);
             son->setChild(tagSon);
             move();
@@ -316,6 +347,9 @@ matchInfo Parser::varrdef(Nonterminal* father) {
                 Terminal* tagSon = new Terminal(scan()->tag);
                 son->setChild(tagSon);
                 move();  
+                //create var
+                Var* var = new Var(symTab.scopePath, isExtern, tag, id, num);
+                symTab.addVar(var);
             } else {
                 tokenIterator = last;
                 return {false, "RBRACK"};
@@ -328,7 +362,7 @@ matchInfo Parser::varrdef(Nonterminal* father) {
         //back
         tokenIterator = last;
         //nonterminal
-        auto initRes = init(son);
+        auto initRes = init(son, isExtern, tag, id, false);
         if(!initRes.status) {
             tokenIterator = last;
             return {false, "(LBRACK | init) > " + initRes.info};
@@ -443,7 +477,7 @@ matchInfo Parser::altexpr(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::defdata(Nonterminal* father) {
+matchInfo Parser::defdata(Nonterminal* father, bool isExtern, Tag tag) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -453,12 +487,14 @@ matchInfo Parser::defdata(Nonterminal* father) {
     //cout<<son->toString()<<endl;
 
     //terminal
+    string id;
     if(scan()->tag == ID) {
+        id = ((Id*)scan())->name;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
         //nonterminal
-        auto varrdefRes = varrdef(son);
+        auto varrdefRes = varrdef(son, isExtern, tag, id);
         if(!varrdefRes .status) {
             tokenIterator = last;
             return {false, "varrdef > " + varrdefRes.info};
@@ -470,7 +506,8 @@ matchInfo Parser::defdata(Nonterminal* father) {
         move();
         //terminal
         if(scan()->tag == ID) {
-            auto initRes = init(son);
+            id = ((Id*)scan())->name;
+            auto initRes = init(son, isExtern, tag, id, true);
             if(!initRes .status) {
                 tokenIterator = last;
                 return {false, "init > " + initRes.info};
@@ -1455,6 +1492,7 @@ matchInfo Parser::arglist(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+//switch
 matchInfo Parser::literal(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1465,13 +1503,27 @@ matchInfo Parser::literal(Nonterminal* father) {
     //cout<<son->toString()<<endl;
 
     //terminal
-    if(scan()->tag == NUM || scan()->tag == CH || scan()->tag == STR) {
-        Terminal* tagSon = new Terminal(scan()->tag);
-        son->setChild(tagSon);
-        move();
-    } else {
-        tokenIterator = last;
-        return {false, "(NUM | CH || STR)"};
+    Token* token = scan();
+    switch(token->tag) {
+        case NUM:
+        case CH:
+        case STR: {
+            Terminal* tagSon = new Terminal(scan()->tag);
+            son->setChild(tagSon);
+            move();
+            //create var
+            Var* var = new Var(token);
+            if(token->tag == STR) {
+                symTab.addStr(var);
+            } else {
+                symTab.addVar(var);
+            }
+            break;
+        }
+        default: {
+            tokenIterator = last;
+            return {false, "(NUM | CH || STR)"};
+        }
     }
 
     //匹配成功，装载节点
@@ -1538,10 +1590,10 @@ matchInfo Parser::localdef(Nonterminal* father) {
     auto typeRes = type(son);
     if(typeRes.status) {
         //nonterminal
-        auto defdataRes = defdata(son);
+        auto defdataRes = defdata(son, false, typeRes.tag);
         if(defdataRes.status) {
             //nonterminal
-            auto deflistRes = deflist(son);
+            auto deflistRes = deflist(son, false, typeRes.tag);
             if(!deflistRes.status) {
                 tokenIterator = last;
                 return {false, "deflist > " + deflistRes.info};

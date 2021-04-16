@@ -5,17 +5,19 @@
 #include <vector>
 #include "parserSign.h"
 #include "../lexical/lexical.h"
-#include "./symTab.h";
+#include "./symTab.h"
 using namespace std;
 
 struct matchInfo {
     bool status;
     string info;
+    Tag tag;
+    Var* var;
 };
 
 class Parser {
     private:
-        Nonterminal *parserRoot;
+        Nonterminal* parserRoot;
         list<Token*> tokenList;
         list<Token*>::iterator tokenIterator;
         SymTab symTab;
@@ -26,18 +28,18 @@ class Parser {
         matchInfo program(Nonterminal* father);
         matchInfo segment(Nonterminal* father);
         matchInfo type(Nonterminal* father);
-        matchInfo def(Nonterminal* father);
-        matchInfo defdata(Nonterminal* father);
-        matchInfo varrdef(Nonterminal* father);
-        matchInfo init(Nonterminal* father);
+        matchInfo def(Nonterminal* father, bool isExtern, Tag tag);
+        matchInfo defdata(Nonterminal* father, bool isExtern, Tag tag);
+        matchInfo varrdef(Nonterminal* father, bool isExtern, Tag tag, string id);
+        matchInfo init(Nonterminal* father, bool isExtern, Tag tag, string id, bool isPoint);
         matchInfo expr(Nonterminal* father);
         matchInfo iddetail(Nonterminal* father);
-        matchInfo deflist(Nonterminal* father);
+        matchInfo deflist(Nonterminal* father, bool isExtern, Tag tag);
         matchInfo fun(Nonterminal* father);
         matchInfo para(Nonterminal* father);
         matchInfo block(Nonterminal* father);
         matchInfo funtail(Nonterminal* father);
-        matchInfo idtail(Nonterminal* father);
+        matchInfo idtail(Nonterminal* father, bool isExtern, Tag tag, string id);
         matchInfo paradata(Nonterminal* father);
         matchInfo paradatatail(Nonterminal* father);
         matchInfo paralist(Nonterminal* father);

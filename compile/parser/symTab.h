@@ -29,16 +29,19 @@ class SymTab {
         vector<int> scopePath;
         void enter();
         void leave();
+        void addVar(Var* var);
+        void addStr(Var* &var);
+        Var* getVar(string name);
 };
 //变量/常量
 class Var {
     public:
         //是否为常量
-        bool literal;
+        bool isLiteral;
         //作用域路径
         vector<int> scopePath;
         //是否有extern关键字
-        bool externed;
+        bool isExtern;
         //变量类型
         Tag type;
         //变量名称
@@ -70,12 +73,60 @@ class Var {
         int size;
         //变量的栈帧偏移
         int offset;
+        //数组的构造函数
+        Var(vector<int> scopePath, bool isExtern, Tag tag, string id, int len) {
+            this->scopePath = scopePath;
+            this->isExtern = isExtern;
+            this->type = tag;
+            this->name = id;
+            this->isArray = true;
+            this->arraySize = len;
+        }
+        //变量/指针变量的构造函数
+        Var(vector<int> scopePath, bool isExtern, Tag tag, bool isPtr, string id, Var* initVal) {
+            this->scopePath = scopePath;
+            this->isExtern = isExtern;
+            this->type = tag;
+            this->isPtr = isPtr;
+            this->name = id;
+            this->initData = initVal;
+        }
+        //常量的构造函数
+        Var(Token* it) {
+            // clear(); ??
+            this->isLiteral = true;
+            this->isLeft = false;
+            switch(it->tag) {
+                case NUM: {
+                    this->type = KW_INT;
+                    this->name = "<int>";
+                    this->intVal = ((Num*)it)->val;
+                    break;
+                }
+                case CH: {
+                    this->type = KW_CHAR;
+                    this->name = "<char>";
+                    this->intVal = 0;
+                    this->charVal = ((Char*)it)->ch;
+                    break;
+                }
+                case STR: {
+                    this->type = KW_CHAR;
+                    //TODO GenCode
+                    // this->name = GenCode::genLb();
+                    this->strVal = ((Str*)it)->str;
+                    this->isArray = true;
+                    this->arraySize = this->strVal.size() + 1;
+                    break;
+                }
+            }
+        }
 };
 //函数
 class Fun {
     public:
         //是否有extern关键字
-        bool externed;
+        bool isExtern;
         //函数的返回类型
         Tag type;
         //函数名
@@ -94,7 +145,8 @@ class Fun {
         //返回点
         InterInst *returnPoint;
         */
-    void enterScope();
-    void leaveScope();
+        void enterScope();
+        void leaveScope();
+        void locate(Var* var);
 };
 #endif
