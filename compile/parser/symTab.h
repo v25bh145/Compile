@@ -32,6 +32,12 @@ class SymTab {
         void addVar(Var* var);
         void addStr(Var* &var);
         Var* getVar(string name);
+        //声明
+        void decFun(Fun* fun);
+        //定义
+        void defFun(Fun* fun);
+        void endDefFun();
+        Fun* getFun(string name, vector<Var*>& args);
 };
 //变量/常量
 class Var {
@@ -125,7 +131,9 @@ class Var {
 //函数
 class Fun {
     public:
-        //是否有extern关键字
+        //是否有extern关键字，注extern在这里是声明（dec）的意思
+        //isExtern = true: 函数只有声明
+        //isExtern = false: 函数有定义
         bool isExtern;
         //函数的返回类型
         Tag type;
@@ -148,5 +156,15 @@ class Fun {
         void enterScope();
         void leaveScope();
         void locate(Var* var);
+        bool match(Fun* fun);
+        bool match(vector<Var*>& args);
+        //这个函数的定义(当只有声明体的函数碰到定义时调用)
+        void define(Fun* def);
+        Fun(bool isExtern, Tag tag, string name, vector<Var*> paraList) {
+            this->isExtern = isExtern;
+            this->type = tag;
+            this->name = name;
+            this->paraVar = paraVar;
+        }
 };
 #endif

@@ -218,7 +218,7 @@ matchInfo Parser::idtail(Nonterminal* father, bool isExtern, Tag tag, string id)
                     move();
 
                     //nonterminal
-                    auto funtailRes = funtail(son);
+                    auto funtailRes = funtail(son, isExtern, tag, id, paraRes.varList);
                     if(!funtailRes.status) {
                         tokenIterator = last;
                         return {false, "funtail > " + funtailRes.info};
@@ -257,6 +257,7 @@ matchInfo Parser::init(Nonterminal* father, bool isExtern, Tag tag, string id, b
         son->setChild(tagSon);
         move();
         //nonterminal
+        //TODO: expr-calculate
         auto exprRes = expr(son);
         if(!exprRes.status) {
             //terminal
@@ -373,6 +374,8 @@ matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id
     father->setChild(son);
     return {true, ""};
 }
+//TODO:
+//return paraList
 matchInfo Parser::para(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -410,7 +413,7 @@ matchInfo Parser::para(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::funtail(Nonterminal* father) {
+matchInfo Parser::funtail(Nonterminal* father, bool isExtern, Tag tag, string id, vector<Var*> paraList) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -419,18 +422,23 @@ matchInfo Parser::funtail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    Fun* fun = new Fun(isExtern, tag, id, paraList);
     //terminal
+    //create func
     if(scan()->tag == SEMICON) {
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
+        symTab.decFun(fun);
     } else {
         //nonterminal
+        symTab.defFun(fun);
         auto blockRes = block(son);
         if(!blockRes.status) {
             tokenIterator = last;
             return {false, "(SEMICON | BLOCK) > "};
         }
+        symTab.endDefFun();
     }
 
     //匹配成功，装载节点

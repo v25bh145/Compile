@@ -31,7 +31,7 @@ void SymTab::addVar(Var* var) {
         if(i == list.size() || var->name[0] == '<') {
             list.push_back(var);
         } else {
-            // TODO 变量重定义
+            // TODO 错误处理
             // SEMERROR(VAR_RE_DEF, var->name);
             delete var;
             return;
@@ -88,6 +88,72 @@ Var* SymTab::getVar(string name) {
         // SEMERROR(VAR_UN_DEC, name);
     return select;
 }
+void SymTab::decFun(Fun* fun) {
+    fun->isExtern = true;
+    //前面没有声明过这个函数
+    if(funTab.find(fun->name) == funTab.end()) {
+        funTab[fun->name] = fun;
+    } else {
+        // 目前不支持重载
+        Fun* last = funTab[fun->name];
+        if(!last->match(fun)) {
+            //TODO 错误处理
+            // SEMERROR(FUN_DEC_ERR, fun->name);
+        }
+        delete fun;
+    }
+}
+void SymTab::defFun(Fun* fun) {
+    if(fun->isExtern) {
+        // TODO 错误处理
+        // SEMERROR(EXTERN_FUN_DEF, fun->name);
+        fun->isExtern = false;
+    }
+    //前面没有声明过这个函数
+    if(funTab.find(fun->name) == funTab.end()) {
+        funTab[fun->name] = fun;
+        // TODO ?
+        // funList.push_back(fun->name);
+    } else {
+        Fun* last = funTab[fun->name];
+        if(last->isExtern) {
+            //匹配到的是函数声明
+            if(!last->match(fun)) {
+                // TODO 错误处理
+                // SEMERROR(FUN_DEC_ERROR, fun->name);
+            }
+            last->define(fun);
+        } else {
+            //重定义
+            // TODO 错误处理
+            // SEMERROR(FUN_RE_DEF, fun->name);
+        }
+        delete fun;
+        fun = last;
+    }
+    curFun = fun;
+    // TODO ir
+    // ir->getFunHead(curFun);
+}
+void SymTab::endDefFun() {
+    // TODO ir
+    // ir->genFunTail(curFun);
+    curFun = NULL;
+}
+Fun* SymTab::getFun(string name, vector<Var*>& args) {
+    if(funTab.find(name) != funTab.end()) {
+        Fun* last = funTab[name];
+        if(!last->match(args)) {
+            // TODO 错误处理
+            // SEMERROR(FUN_CALL_ERR, name);
+            return NULL;
+        }
+        return last;
+    }
+    // TODO 错误处理
+    // SEMERROR(FUN_UN_DEC, name);
+    return NULL;
+}
 void Fun::enterScope() {
     //进入函数内的作用域
     //e.g:
@@ -115,4 +181,37 @@ void Fun::locate(Var* var) {
     //当前栈指针位置
     curEsp += size;
     var->offset = -curEsp;
+}
+bool Fun::match(Fun* fun) {
+    //参数名不同
+    if(name != fun->name) return false;
+    int len = paraVar.size();
+    //参数长度不同
+    if(len != fun->paraVar.size()) return false;
+    //TODO: GenIR
+    // for(int i = 0; i < len; i++) {
+    //     //typeCheck:两种类型可以转换但是不同，例如int*与int[]
+    //     if(GenIR::typeCheck(paraVar[i], fun->paraVar[i])) {
+    //         //TODO 错误处理
+    //         if(paraVar[i]->type != fun->paraVar[i]->type) SEMWARN(FN_DEC_CONFLICT, name);
+    //     } else return false;
+    // }
+    //TODO 错误处理
+    // if(type != fun->type) SEMWARN(FUN_RET_CONFLICT, name);
+    return true;
+}
+bool Fun::match(vector<Var*>& args) {
+    int len = paraVar.size();
+    //参数长度不同
+    if(len != args.size()) return false;
+    //TODO: GenIR
+    // for(int i = 0; i < len; i++) {
+    //     //typeCheck:两种类型可以转换但是不同，例如int*与int[]
+    //     if(!GenIR::typeCheck(paraVar[i], args[i])) return false;
+    // }  
+    return true;
+}
+void Fun::define(Fun* def) {
+    isExtern = false;
+    paraVar = def->paraVar;
 }

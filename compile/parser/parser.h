@@ -11,8 +11,10 @@ using namespace std;
 struct matchInfo {
     bool status;
     string info;
+    //
     Tag tag;
     Var* var;
+    vector<Var*> varList;
 };
 
 class Parser {
@@ -38,7 +40,7 @@ class Parser {
         matchInfo fun(Nonterminal* father);
         matchInfo para(Nonterminal* father);
         matchInfo block(Nonterminal* father);
-        matchInfo funtail(Nonterminal* father);
+        matchInfo funtail(Nonterminal* father, bool isExtern, Tag tag, string id, vector<Var*> paraList);
         matchInfo idtail(Nonterminal* father, bool isExtern, Tag tag, string id);
         matchInfo paradata(Nonterminal* father);
         matchInfo paradatatail(Nonterminal* father);
