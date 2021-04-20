@@ -25,6 +25,8 @@ class SymTab {
         Fun* curFun;
         //作用域编号
         int scopeId;
+        //ir
+        GenIR ir;
         //作用域路径
         vector<int> scopePath;
         void enter();
@@ -63,7 +65,7 @@ class Var {
         //初始数据
         Var* initData;
         //是否初始化
-        bool inited;
+        bool isInit;
         //int char初值
         union{
             int intVal;
@@ -83,16 +85,15 @@ class Var {
         Var(vector<int> scopePath, bool isExtern, Tag tag, string id, int len) {
             this->scopePath = scopePath;
             this->isExtern = isExtern;
-            this->type = tag;
+            this->setType(tag);
             this->name = id;
-            this->isArray = true;
-            this->arraySize = len;
+            this->setArray(len);
         }
         //变量/指针变量的构造函数
         Var(vector<int> scopePath, bool isExtern, Tag tag, bool isPtr, string id, Var* initVal) {
             this->scopePath = scopePath;
             this->isExtern = isExtern;
-            this->type = tag;
+            this->setType(tag);
             this->isPtr = isPtr;
             this->name = id;
             this->initData = initVal;
@@ -104,29 +105,31 @@ class Var {
             this->isLeft = false;
             switch(it->tag) {
                 case NUM: {
-                    this->type = KW_INT;
+                    this->setType(KW_INT);
                     this->name = "<int>";
                     this->intVal = ((Num*)it)->val;
                     break;
                 }
                 case CH: {
-                    this->type = KW_CHAR;
+                    this->setType(KW_CHAR);
                     this->name = "<char>";
                     this->intVal = 0;
                     this->charVal = ((Char*)it)->ch;
                     break;
                 }
                 case STR: {
-                    this->type = KW_CHAR;
+                    this->setType(KW_CHAR);
                     //TODO GenCode
                     // this->name = GenCode::genLb();
                     this->strVal = ((Str*)it)->str;
-                    this->isArray = true;
-                    this->arraySize = this->strVal.size() + 1;
+                    this->setArray(this->strVal.size() + 1);
                     break;
                 }
             }
         }
+        void Var::setType(Tag t);
+        void Var::setArray(int len);
+        bool Var::setInit();
 };
 //函数
 class Fun {
@@ -166,5 +169,12 @@ class Fun {
             this->name = name;
             this->paraVar = paraVar;
         }
+};
+//代码生成的辅助函数
+class GenIR {
+    bool genVarInit(Var* var);
+    Var* genOneOpRight(Var* val, Tag opt);
+    Var* genArray(Var* array, Var* index);
+    void genReturn(Var* ret);
 };
 #endif

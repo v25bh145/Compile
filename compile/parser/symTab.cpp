@@ -140,6 +140,62 @@ void SymTab::endDefFun() {
     // ir->genFunTail(curFun);
     curFun = NULL;
 }
+//给变量设置类型 & 类型检查
+void Var::setType(Tag t) {
+    this->type = t;
+    if(this->type == KW_VOID) {
+        // TODO 错误处理
+        // SEMERROR(VOID_VAR, "");
+        this->type = KW_INT;
+    }
+    if(!this->isExtern && this->type == KW_INT) this->size = 4;
+    else if(!this->isExtern && this->type == KW_CHAR) this->size = 1;
+}
+//给数组设置长度 & 类型检查
+void Var::setArray(int len) {
+    if(len <= 0) {
+        // TODO 错误处理
+        // SEMERROR(ARRAY_LEN_INVALID, name);
+        return ;
+    }
+    isArray = true;
+    isLeft = false;
+    arraySize = len;
+    if(!isExtern) size *= len;
+}
+//返回值: 返回true，则需要先计算表达式的值后再对局部变量进行初始化，否则不需要。
+bool Var::setInit() {
+    Var* init = initData;
+    if(!init) return false;
+    isInit = false;
+    if(isExtern) {
+        // 错误处理
+        // SEMERROR(DEC_INIT_DENY, name);
+
+        // 变量的初始化类型是否与变量的声明类型相同或可转换
+        // TODO GenIR
+    // } else if (!GenIR::typeCheck(this, init)) {
+        // TODO 错误处理
+        // SEMERROR(VAR_INIT_ERR, name);
+    } else if(init->isLiteral) {
+        //常量
+        isInit = true;
+        if(init->isArray)
+            ptrVal = init->name;
+        else
+            intVal = init->intVal;
+    } else {
+        //变量
+        if(scopePath.size() == 1) {
+            // 全局变量的初始化必须是常量
+            // TODO 错误处理
+            // SEMERROR(GLB_INIT_ERR, name);
+        }
+        //局部变量
+        else return true;
+    }
+    return false;
+}
 Fun* SymTab::getFun(string name, vector<Var*>& args) {
     if(funTab.find(name) != funTab.end()) {
         Fun* last = funTab[name];
