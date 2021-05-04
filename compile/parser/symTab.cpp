@@ -1,4 +1,5 @@
 #include "symTab.h"
+#include "semError.h"
 using namespace std;
 void SymTab::enter() {
     scopeId++;
@@ -31,8 +32,8 @@ void SymTab::addVar(Var* var) {
         if(i == list.size() || var->name[0] == '<') {
             list.push_back(var);
         } else {
-            // TODO 错误处理
-            // SEMERROR(VAR_RE_DEF, var->name);
+            // 错误处理
+            SEMERROR(VAR_RE_DEF, var->name);
             delete var;
             return;
         }
@@ -83,9 +84,9 @@ Var* SymTab::getVar(string name) {
             }
         }
     }
-    //TODO 错误处理
-    // if(!select) 
-        // SEMERROR(VAR_UN_DEC, name);
+    // 错误处理
+    if(!select) 
+        SEMERROR(VAR_UN_DEC, name);
     return select;
 }
 void SymTab::decFun(Fun* fun) {
@@ -97,16 +98,16 @@ void SymTab::decFun(Fun* fun) {
         // 目前不支持重载
         Fun* last = funTab[fun->name];
         if(!last->match(fun)) {
-            //TODO 错误处理
-            // SEMERROR(FUN_DEC_ERR, fun->name);
+            // 错误处理
+            SEMERROR(FUN_DEC_ERR, fun->name);
         }
         delete fun;
     }
 }
 void SymTab::defFun(Fun* fun) {
     if(fun->isExtern) {
-        // TODO 错误处理
-        // SEMERROR(EXTERN_FUN_DEF, fun->name);
+        // 错误处理
+        SEMERROR(EXTERN_FUN_DEF, fun->name);
         fun->isExtern = false;
     }
     //前面没有声明过这个函数
@@ -119,14 +120,14 @@ void SymTab::defFun(Fun* fun) {
         if(last->isExtern) {
             //匹配到的是函数声明
             if(!last->match(fun)) {
-                // TODO 错误处理
-                // SEMERROR(FUN_DEC_ERROR, fun->name);
+                // 错误处理
+                SEMERROR(FUN_DEC_ERR, fun->name);
             }
             last->define(fun);
         } else {
             //重定义
-            // TODO 错误处理
-            // SEMERROR(FUN_RE_DEF, fun->name);
+            // 错误处理
+            SEMERROR(FUN_RE_DEF, fun->name);
         }
         delete fun;
         fun = last;
@@ -144,8 +145,8 @@ void SymTab::endDefFun() {
 void Var::setType(Tag t) {
     this->type = t;
     if(this->type == KW_VOID) {
-        // TODO 错误处理
-        // SEMERROR(VOID_VAR, "");
+        // 错误处理
+        SEMERROR(VOID_VAR, "");
         this->type = KW_INT;
     }
     if(!this->isExtern && this->type == KW_INT) this->size = 4;
@@ -154,14 +155,60 @@ void Var::setType(Tag t) {
 //给数组设置长度 & 类型检查
 void Var::setArray(int len) {
     if(len <= 0) {
-        // TODO 错误处理
-        // SEMERROR(ARRAY_LEN_INVALID, name);
+        // 错误处理
+        SEMERROR(ARRAY_LEN_INVALID, name);
         return ;
     }
     isArray = true;
     isLeft = false;
     arraySize = len;
     if(!isExtern) size *= len;
+}
+//数组的构造函数
+Var::Var(vector<int> scopePath, bool isExtern, Tag tag, string id, int len) {
+    this->scopePath = scopePath;
+    this->isExtern = isExtern;
+    this->setType(tag);
+    this->name = id;
+    this->setArray(len);
+}
+//变量/指针变量的构造函数
+Var::Var(vector<int> scopePath, bool isExtern, Tag tag, bool isPtr, string id, Var* initVal) {
+    this->scopePath = scopePath;
+    this->isExtern = isExtern;
+    this->setType(tag);
+    this->isPtr = isPtr;
+    this->name = id;
+    this->initData = initVal;
+}
+//常量的构造函数
+Var::Var(Token* it) {
+    // clear(); ??
+    this->isLiteral = true;
+    this->isLeft = false;
+    switch(it->tag) {
+        case NUM: {
+            this->setType(KW_INT);
+            this->name = "<int>";
+            this->intVal = ((Num*)it)->val;
+            break;
+        }
+        case CH: {
+            this->setType(KW_CHAR);
+            this->name = "<char>";
+            this->intVal = 0;
+            this->charVal = ((Char*)it)->ch;
+            break;
+        }
+        case STR: {
+            this->setType(KW_CHAR);
+            // GenCode
+            // this->name = GenCode::genLb();
+            this->strVal = ((Str*)it)->str;
+            this->setArray(this->strVal.size() + 1);
+            break;
+        }
+    }
 }
 //返回值: 返回true，则需要先计算表达式的值后再对局部变量进行初始化，否则不需要。
 bool Var::setInit() {
@@ -170,13 +217,12 @@ bool Var::setInit() {
     isInit = false;
     if(isExtern) {
         // 错误处理
-        // SEMERROR(DEC_INIT_DENY, name);
+        SEMERROR(DEC_INIT_DENY, name);
 
         // 变量的初始化类型是否与变量的声明类型相同或可转换
-        // TODO GenIR
-    // } else if (!GenIR::typeCheck(this, init)) {
-        // TODO 错误处理
-        // SEMERROR(VAR_INIT_ERR, name);
+    } else if (!GenIR::typeCheck(this, init)) {
+        // 错误处理
+        SEMERROR(VAR_INIT_ERR, name);
     } else if(init->isLiteral) {
         //常量
         isInit = true;
@@ -188,26 +234,39 @@ bool Var::setInit() {
         //变量
         if(scopePath.size() == 1) {
             // 全局变量的初始化必须是常量
-            // TODO 错误处理
-            // SEMERROR(GLB_INIT_ERR, name);
+            // 错误处理
+            SEMERROR(GLB_INIT_ERR, name);
         }
         //局部变量
         else return true;
     }
     return false;
 }
+bool Var::isVoid() {
+    return this->type == KW_VOID;
+}
+bool Var::isBase() {
+    return !(this->isPtr || this->isArray);
+}
+bool Var::isRef() {
+    return (this->isPtr || this->isArray);
+}
+// 猜测: 返回一个void变量
+// Var* Var::getVoid() {
+//     return;
+// }
 Fun* SymTab::getFun(string name, vector<Var*>& args) {
     if(funTab.find(name) != funTab.end()) {
         Fun* last = funTab[name];
         if(!last->match(args)) {
-            // TODO 错误处理
-            // SEMERROR(FUN_CALL_ERR, name);
+            // 错误处理
+            SEMERROR(FUN_CALL_ERR, name);
             return NULL;
         }
         return last;
     }
-    // TODO 错误处理
-    // SEMERROR(FUN_UN_DEC, name);
+    // 错误处理
+    SEMERROR(FUN_UN_DEC, name);
     return NULL;
 }
 void Fun::enterScope() {
@@ -244,27 +303,24 @@ bool Fun::match(Fun* fun) {
     int len = paraVar.size();
     //参数长度不同
     if(len != fun->paraVar.size()) return false;
-    //TODO: GenIR
-    // for(int i = 0; i < len; i++) {
-    //     //typeCheck:两种类型可以转换但是不同，例如int*与int[]
-    //     if(GenIR::typeCheck(paraVar[i], fun->paraVar[i])) {
-    //         //TODO 错误处理
-    //         if(paraVar[i]->type != fun->paraVar[i]->type) SEMWARN(FN_DEC_CONFLICT, name);
-    //     } else return false;
-    // }
-    //TODO 错误处理
-    // if(type != fun->type) SEMWARN(FUN_RET_CONFLICT, name);
+    for(int i = 0; i < len; i++) {
+        //typeCheck:两种类型可以转换但是不同，例如int*与int[]
+        if(GenIR::typeCheck(paraVar[i], fun->paraVar[i])) {
+            if(paraVar[i]->type != fun->paraVar[i]->type) SEMWARN(FUN_DEC_CONFLICT, name);
+        } else return false;
+    }
+    // 错误处理
+    if(type != fun->type) SEMWARN(FUN_RET_CONFLICT, name);
     return true;
 }
 bool Fun::match(vector<Var*>& args) {
     int len = paraVar.size();
     //参数长度不同
     if(len != args.size()) return false;
-    //TODO: GenIR
-    // for(int i = 0; i < len; i++) {
-    //     //typeCheck:两种类型可以转换但是不同，例如int*与int[]
-    //     if(!GenIR::typeCheck(paraVar[i], args[i])) return false;
-    // }  
+    for(int i = 0; i < len; i++) {
+        //typeCheck:两种类型可以转换但是不同，例如int*与int[]
+        if(!GenIR::typeCheck(paraVar[i], args[i])) return false;
+    }  
     return true;
 }
 void Fun::define(Fun* def) {

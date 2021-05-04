@@ -445,6 +445,7 @@ matchInfo Parser::funtail(Nonterminal* father, bool isExtern, Tag tag, string id
     father->setChild(son);
     return {true, ""};
 }
+//return revised
 matchInfo Parser::expr(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -463,8 +464,9 @@ matchInfo Parser::expr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return assexprRes;
 }
+//return revised
 matchInfo Parser::altexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -474,16 +476,23 @@ matchInfo Parser::altexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
-    //nonterminal
-    auto exprRes = expr(son);
-    if(!exprRes.status) {
-        tokenIterator = last;
-        
-    }
+    matchInfo result = {true, ""};
+    // TODO EXPR_FIRST
+    // if(EXPR_FIRST) {
+        //nonterminal
+        auto exprRes = expr(son);
+        if(!exprRes.status) {
+            tokenIterator = last;
+            
+        }
+        result.var = exprRes.var;
+    // } else {
+        result.var = Var::getVoid();
+    // }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
 matchInfo Parser::defdata(Nonterminal* father, bool isExtern, Tag tag) {
     //如果词记号到头，则直接返回
@@ -706,6 +715,7 @@ matchInfo Parser::block(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+//return revised
 matchInfo Parser::assexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -717,9 +727,10 @@ matchInfo Parser::assexpr(Nonterminal* father) {
 
     //nonterminal
     auto orexprRes = orexpr(son);
+    matchInfo asstailRes;
     if(orexprRes.status) {
         //nonterminal
-        auto asstailRes = asstail(son);
+        asstailRes = asstail(son, orexprRes.var);
         if(!asstailRes.status) {
             tokenIterator = last;
             return {false, "asstail > " + orexprRes.info};
@@ -731,7 +742,7 @@ matchInfo Parser::assexpr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return asstailRes;
 }
 matchInfo Parser::orexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -910,7 +921,9 @@ matchInfo Parser::factor(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
-matchInfo Parser::asstail(Nonterminal* father) {
+//args revised
+//return revised
+matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -919,20 +932,25 @@ matchInfo Parser::asstail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == ASSIGN) {
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
         //nonterminal
+        //val - into asstail
         auto orexprRes = orexpr(son);
         if(orexprRes.status) {
             //nonterminal
-            auto asstailRes = asstail(son);
+            //rval
+            auto asstailRes = asstail(son, orexprRes.var);
             if(!asstailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+            } else {
+                // ir
+                result.var = ir.genTwoOp(lval, ASSIGN, asstailRes.var);
             }
         } else {
             //terminal
@@ -947,7 +965,7 @@ matchInfo Parser::asstail(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
 matchInfo Parser::ortail(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -1621,6 +1639,7 @@ matchInfo Parser::localdef(Nonterminal* father) {
 }
 //switch
 //fixed
+//add returnPoint
 matchInfo Parser::statement(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1672,6 +1691,7 @@ matchInfo Parser::statement(Nonterminal* father) {
             //nonterminal
             auto altexprRes = altexpr(son);
             if(altexprRes.status) {
+                ir.genReturn(altexprRes.var);
                 //terminal
                 if(scan()->tag == SEMICON) {
                     Terminal* tagSon = new Terminal(scan()->tag);

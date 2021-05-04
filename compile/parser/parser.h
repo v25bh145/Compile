@@ -19,6 +19,8 @@ struct matchInfo {
 
 class Parser {
     private:
+    // TODO init ir
+        GenIR ir;
         Nonterminal* parserRoot;
         list<Token*> tokenList;
         list<Token*>::iterator tokenIterator;
@@ -49,7 +51,7 @@ class Parser {
         matchInfo localdef(Nonterminal* father);
         matchInfo statement(Nonterminal* father);
         matchInfo assexpr(Nonterminal* father);
-        matchInfo asstail(Nonterminal* father);
+        matchInfo Parser::asstail(Nonterminal* father, Var* lval);
         matchInfo orexpr(Nonterminal* father);
         matchInfo ortail(Nonterminal* father);
         matchInfo andexpr(Nonterminal* father);
@@ -90,6 +92,9 @@ class Parser {
             parserRoot = new Nonterminal(ROOT);
             initNonterminalMap();
             this->symTab = SymTab();
+            this->ir = GenIR();
+            this->symTab.bindIr(&this->ir);
+            this->ir.bindSymTab(&this->symTab);
         }
         //in parserMain.cpp
         Nonterminal *run();
