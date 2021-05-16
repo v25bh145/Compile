@@ -83,7 +83,7 @@ class Parser {
         matchInfo ifstat(Nonterminal* father);
         matchInfo forinit(Nonterminal* father);
         matchInfo elsestat(Nonterminal* father);
-        matchInfo casestat(Nonterminal* father);
+        matchInfo casestat(Nonterminal* father, Var* cond);
         matchInfo caselabel(Nonterminal* father);
     public:
         Parser(list<Token*> tokenList) {

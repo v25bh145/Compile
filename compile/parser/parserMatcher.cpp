@@ -10,6 +10,7 @@
  *  if
  *  else
  *  switch
+ *  case
  *  idtail
  **/
 /**
@@ -24,7 +25,6 @@
  * <defdata> (bool isExtern, Tag tag) / 
  * <init> (bool isExtern, Tag tag, string ID, bool isPoint) / / Y
  **/
-//TODO: <expr>
 #include "parser.h"
 #include "parserSign.h"
 using namespace std;
@@ -257,7 +257,6 @@ matchInfo Parser::init(Nonterminal* father, bool isExtern, Tag tag, string id, b
         son->setChild(tagSon);
         move();
         //nonterminal
-        //TODO: expr-calculate
         auto exprRes = expr(son);
         if(!exprRes.status) {
             //terminal
@@ -374,7 +373,7 @@ matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id
     father->setChild(son);
     return {true, ""};
 }
-//TODO:
+// TODO: 我要TODO啥来着，真想做时光机到过去把我鲨了
 //return paraList
 matchInfo Parser::para(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -1760,6 +1759,8 @@ matchInfo Parser::statement(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+// IR
+// InterInst
 matchInfo Parser::whilestat(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1772,6 +1773,8 @@ matchInfo Parser::whilestat(Nonterminal* father) {
     //terminal
     if(scan()->tag == KW_WHILE) {
         symTab.enter();
+        InterInst* _while, *_exit;
+        ir.genWhileHead(_while, _exit);
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1783,6 +1786,7 @@ matchInfo Parser::whilestat(Nonterminal* father) {
             //nonterminal
             auto altexprRes = altexpr(son);
             if(altexprRes.status) {
+                ir.genWhileCond(altexprRes.var, _exit);
                 //terminal
                 if(scan()->tag == RPAREN) {
                     Terminal* tagSon = new Terminal(scan()->tag);
@@ -1806,6 +1810,7 @@ matchInfo Parser::whilestat(Nonterminal* father) {
             tokenIterator = last;
             return {false, "LPAREN"};
         }
+        ir.genWhileTail(_while, _exit);
         symTab.leave();
     } else {
         tokenIterator = last;
@@ -1816,6 +1821,8 @@ matchInfo Parser::whilestat(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+// InterInst
+// IR
 matchInfo Parser::dowhilestat(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1831,6 +1838,8 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
+        InterInst* _do, *_exit;
+        ir.genDoWhileHead(_do, _exit);
         //nonterminal
         auto blockRes = block(son);
         if(blockRes.status) {
@@ -1858,6 +1867,7 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
                                 Terminal* tagSon = new Terminal(scan()->tag);
                                 son->setChild(tagSon);
                                 move();
+                                ir.genDoWhileTail(altexprRes.var, _do, _exit);
                             } else {
                                 tokenIterator = last;
                                 return {false, "SEMICON"};
@@ -1891,6 +1901,8 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+// ir
+// symTab
 matchInfo Parser::forstat(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1904,6 +1916,7 @@ matchInfo Parser::forstat(Nonterminal* father) {
     //terminal
     if(scan()->tag == KW_FOR) {
         symTab.enter();
+        InterInst *_for, *_exit, *_step, *_block;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1915,9 +1928,13 @@ matchInfo Parser::forstat(Nonterminal* father) {
             //nonterminal
             auto forinitRes = forinit(son);
             if(forinitRes.status) {
+                // ir
+                ir.genForHead(_for, _exit);
                 //nonterminal
                 auto altexprRes = altexpr(son);
                 if(altexprRes.status) {
+                    // ir
+                    ir.genForCondBegin(altexprRes.var, _step, _block, _exit);
                     //terminal
                     if(scan()->tag == SEMICON) {
                         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1928,6 +1945,8 @@ matchInfo Parser::forstat(Nonterminal* father) {
                         if(altexpr2Res.status) {
                             //terminal
                             if(scan()->tag == RPAREN) {
+                                // ir
+                                ir.genForCondEnd(_for, _block);
                                 Terminal* tagSon = new Terminal(scan()->tag);
                                 son->setChild(tagSon);
                                 move();
@@ -1937,6 +1956,8 @@ matchInfo Parser::forstat(Nonterminal* father) {
                                     tokenIterator = last;
                                     return {false, "block > " + blockRes.info};
                                 }
+                                // ir
+                                ir.genForTail(_step, _exit);
                             } else {
                                 tokenIterator = last;
                                 return {false, "RPAREN"};
@@ -2009,6 +2030,8 @@ matchInfo Parser::forinit(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+//ir
+//exprRes.var
 matchInfo Parser::ifstat(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -2017,6 +2040,8 @@ matchInfo Parser::ifstat(Nonterminal* father) {
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
     //cout<<son->toString()<<endl;
+
+    InterInst *_else, *_exit;
 
     //terminal
     if(scan()->tag == KW_IF) {
@@ -2037,14 +2062,24 @@ matchInfo Parser::ifstat(Nonterminal* father) {
                         Terminal* tagSon = new Terminal(scan()->tag);
                         son->setChild(tagSon);
                         move();
+                        // ifHead
+                        ir.genIfHead(exprRes.var, _else);
                         //nonterminal
                         auto blockRes = block(son);
                         if(blockRes.status) {
-                            //nonterminal
-                            auto elsestatRes = elsestat(son);
-                            if(!elsestatRes.status) {
-                                tokenIterator = last;
-                                return {false, "elsestat > " + elsestatRes.info};
+                            // previous justifying for ir
+                            if(scan()->tag == KW_ELSE) {
+                                ir.genElseHead(_else, _exit);
+                                //nonterminal
+                                auto elsestatRes = elsestat(son);
+                                if(!elsestatRes.status) {
+                                    tokenIterator = last;
+                                    return {false, "elsestat > " + elsestatRes.info};
+                                }
+                                ir.genElseTail(_exit);
+                            }
+                             else {
+                                ir.genIfTail(_else);
                             }
                         } else {
                             tokenIterator = last;
@@ -2104,6 +2139,8 @@ matchInfo Parser::elsestat(Nonterminal* father) {
     father->setChild(son);
     return {true, ""};
 }
+// InterInst
+// IR
 matchInfo Parser::switchstat(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -2116,6 +2153,8 @@ matchInfo Parser::switchstat(Nonterminal* father) {
     //terminal
     if(scan()->tag == KW_SWITCH) {
         symTab.enter();
+        InterInst* _exit;
+        ir.genSwitchHead(_exit);
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -2138,13 +2177,14 @@ matchInfo Parser::switchstat(Nonterminal* father) {
                         son->setChild(tagSon);
                         move();
                         //nonterminal
-                        auto casestatRes = casestat(son);
+                        auto casestatRes = casestat(son, exprRes.var);
                         if(casestatRes.status) {
                             //terminal
                             if(scan()->tag == RBRACE) {
                                 Terminal* tagSon = new Terminal(scan()->tag);
                                 son->setChild(tagSon);
                                 move();
+                                ir.genSwitchTail(_exit);
                             } else {
                                 tokenIterator = last;
                                 return {false, "RBRACE"};
@@ -2181,7 +2221,9 @@ matchInfo Parser::switchstat(Nonterminal* father) {
     return {true, ""};
 }
 //switch
-matchInfo Parser::casestat(Nonterminal* father) {
+// InterInst
+// cond
+matchInfo Parser::casestat(Nonterminal* father, Var* cond) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -2196,13 +2238,19 @@ matchInfo Parser::casestat(Nonterminal* father) {
             Terminal* tagSon = new Terminal(scan()->tag);
             son->setChild(tagSon);
             move();
+
+            InterInst* _case_exit;
             //nonterminal
             auto caselabelRes = caselabel(son);
             if(caselabelRes.status) {
+                ir.genCaseHead(cond, caselabelRes.var, _case_exit);
                 if(scan()->tag == COLON) {
+                    symTab.enter();
                     auto subprogramRes = subprogram(son);
+                    symTab.leave();
+                    ir.genCaseTail(_case_exit);
                     if(subprogramRes.status) {
-                        auto casestatRes = casestat(son);
+                        auto casestatRes = casestat(son, cond);
                         if(!casestatRes.status) {
                             tokenIterator = last;
                             return {false, "casestat > " + casestatRes.info};
@@ -2231,7 +2279,9 @@ matchInfo Parser::casestat(Nonterminal* father) {
                 Terminal* tagSon = new Terminal(scan()->tag);
                 son->setChild(tagSon);
                 move();
+                symTab.enter();
                 auto subprogramRes = subprogram(son);
+                symTab.leave();
                 if(!subprogramRes.status) {
                     tokenIterator = last;
                     return {false, "subprogram > " + subprogramRes.info};

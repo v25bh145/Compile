@@ -3,15 +3,15 @@
 using namespace std;
 GenIR::GenIR(SymTab* symTab) {
     this->symTab = symTab;
+    GenIR::lbNum = 0;
 }
 bool GenIR::genVarInit(Var* var) {
     //处理整型、字符型常量的Var对象，他们不需要初始化
     if(var->name[0] == '<') return false;
     symTab->addInst(new InterInst(OP_DEC, var));
     // 返回true，说明需要生成赋值代码
-    // TODO getInitData
-    // if(var->setInit()) 
-        // genTwoOp(var, ASSIGN, var->getInitData());
+    if(var->setInit()) 
+        genTwoOp(var, ASSIGN, var->initData);
     return true;
 }
 void GenIR::genReturn(Var* ret) {
@@ -53,17 +53,15 @@ Var* GenIR::genPtr(Var* val) {
     // Var construct
     Var* tmp = new Var(symTab->scopePath, val->type, false);
     tmp->isLeft = true;
-    // TODO Var setPointer
-    // tmp.setPointer(val);
+    tmp->ptr = val;
     symTab->addVar(tmp);
     return tmp;
 }  
 Var* GenIR::genLea(Var* val) {
-    // TODO Var getLeft
-    // if(!val->getLeft()) {
-        // SEMERROR(EXPR_NOT_LEFT_VAL, val->name);
-        // return val;
-    // }
+    if(!val->isLeft) {
+        SEMERROR(EXPR_NOT_LEFT_VAL, val->name);
+        return val;
+    }
     if(val->isRef())
         return val->ptr;
     else {
@@ -88,11 +86,10 @@ Var* GenIR::genAssign(Var* val) {
 }
 //将指针运算结果作为左值
 Var* GenIR::genAssign(Var* lval, Var* rval) {
-    // TODO Var getLeft
-    // if(!lval->getLeft()) {
-        // SEMERROR(EXPR_NOT_LEFT_VAL, lval->name);
-        // return lval;
-    // }
+    if(!lval->isLeft) {
+        SEMERROR(EXPR_NOT_LEFT_VAL, lval->name);
+        return lval;
+    }
     // typeCheck
     if(!typeCheck(lval, rval)) {
         SEMERROR(ASSIGN_TYPE_ERR, rval->name);
@@ -385,4 +382,128 @@ Var* GenIR::genCall(Fun* function, vector<Var*>& args) {
         symTab->addVar(ret);
         return ret;
     }
+}
+void GenIR::genIfHead(Var* cond, InterInst*& _else) {
+    //生成一个随机的标签
+    _else = new InterInst();
+    if(cond) {
+        if(cond->isRef()) cond = genAssign(cond);
+        symTab->addInst(new InterInst(OP_JF, _else, cond));
+    }
+}
+void GenIR::genIfTail(InterInst*& _exit) {
+    symTab->addInst(_exit);
+}
+void GenIR::genElseHead(InterInst* _else, InterInst*& _exit) {
+    //生成一个随机的标签
+    _exit = new InterInst();
+    symTab->addInst(new InterInst(OP_JMP, _exit));
+    symTab->addInst(_else);
+}
+void GenIR::genElseTail(InterInst*& _exit) {
+    symTab->addInst(_exit);
+}
+string GenIR::genLb() {
+    lbNum++;
+    string lb = "@L";
+    return lb + to_string(lbNum);
+}
+// 产生_exit标签，为其内部的break提供信息
+void GenIR::genSwitchHead(InterInst*& _exit) {
+    _exit = new InterInst();
+    push(NULL, _exit);
+}
+// OP_JMP _exit
+void GenIR::genSwitchTail(InterInst*& _exit) {
+    symTab->addInst(new InterInst(OP_JMP, _exit));
+    pop();
+}
+// 产生_case_exit标签，为其内部的break提供信息
+// OP_JNE _case_exit cond lb
+void GenIR::genCaseHead(Var* cond, Var* lb, InterInst*& _case_exit) {
+    _case_exit = new InterInst();
+    if(lb) symTab->addInst(new InterInst(OP_JNE, _case_exit, cond, lb));
+}
+// _case_exit:
+void GenIR::genCaseTail(InterInst* _case_exit) {
+    symTab->addInst(_case_exit);
+}
+void GenIR::genWhileHead(InterInst*& _while, InterInst* _exit) {
+    _while = new InterInst();
+    symTab->addInst(_while);
+    _exit = new InterInst();
+    push(_while, _exit);
+}
+void GenIR::genWhileCond(Var* cond, InterInst* _exit) {
+    if(cond) {
+        if(cond->isVoid()) cond = Var::getTrue();
+        else if(cond->isRef()) cond = genAssign(cond);
+        symTab->addInst(new InterInst(OP_JF, _exit, cond));
+    }
+}
+void GenIR::genWhileTail(InterInst*& _while, InterInst*& _exit) {
+    symTab->addInst(new InterInst(OP_JMP, _while));
+    symTab->addInst(_exit);
+    pop();
+}
+void GenIR::genDoWhileHead(InterInst*& _do, InterInst* _exit) {
+    _do = new InterInst();
+    symTab->addInst(_do);
+    _exit = new InterInst();
+    push(_do, _exit);
+}
+void GenIR::genDoWhileTail(Var* cond, InterInst*& _do, InterInst*& _exit) {
+    if(cond) {
+        if(cond->isVoid()) cond = Var::getTrue();
+        else if(cond->isRef()) cond = genAssign(cond);
+        symTab->addInst(new InterInst(OP_JT, _do, cond));
+    }
+    symTab->addInst(_exit);
+    pop();
+}
+// 
+void GenIR::genForHead(InterInst*& _for, InterInst*& _exit) {
+    _for = new InterInst();
+    _exit = new InterInst();
+    symTab->addInst(_for);
+}
+void GenIR::genForCondBegin(Var* cond, InterInst*& _step, InterInst*& _block, InterInst* _exit) {
+    _block = new InterInst();
+    _step = new InterInst();
+    if(cond) {
+        if(cond->isVoid()) cond = Var::getTrue();
+        else if(cond->isRef()) cond = genAssign(cond);
+        symTab->addInst(new InterInst(OP_JF, _exit, cond));
+        symTab->addInst(new InterInst(OP_JMP, _block));
+    }
+    symTab->addInst(_step);
+    push(_step, _exit);
+}
+void GenIR::genForCondEnd(InterInst* _for, InterInst* _block) {
+    symTab->addInst(new InterInst(OP_JMP, _for));
+    symTab->addInst(_block);
+}
+void GenIR::genForTail(InterInst*& _step, InterInst*& _exit) {
+    symTab->addInst(new InterInst(OP_JMP, _step));
+    symTab->addInst(_exit);
+    pop();
+}
+// 
+void GenIR::push(InterInst* head, InterInst* tail) {
+    heads.push_back(head);
+    tails.push_back(tail);
+}
+void GenIR::pop() {
+    heads.pop_back();
+    tails.pop_back();
+}
+void GenIR::genBreak() {
+    InterInst* tail = tails.back();
+    if(tail) symTab->addInst(new InterInst(OP_JMP, tail));
+    else SEMERROR(BREAK_ERR, "break");
+}
+void GenIR::genContinue() {
+    InterInst* head = heads.back();
+    if(head) symTab->addInst(new InterInst(OP_JMP, head));
+    else SEMERROR(CONTINUE_ERR, "continue");
 }

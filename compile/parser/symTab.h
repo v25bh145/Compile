@@ -114,6 +114,8 @@ public:
     bool isBase();
     bool isRef();
     static Var* getVoid();
+    static Var* getTrue();
+    Var();
 };
 //函数
 class Fun {
@@ -157,8 +159,10 @@ public:
 };
 //代码生成的辅助函数
 class GenIR {
+private:
+    static int lbNum;
 public:
-    GenIR() {}
+    GenIR() {GenIR::lbNum = 0;}
 // TODO init file
     FILE* file;
     SymTab* symTab;
@@ -177,13 +181,7 @@ public:
     //操作为lval = rval，返回lval
     Var* genAssign(Var* lval, Var* rval);
     bool typeCheck(Var* lval, Var* rval);
-    static bool typeCheck(Var* lval, Var* rval) {
-        bool flag = false;
-        if(!rval) return false;
-        if(lval->isBase() && rval->isBase()) flag = true;
-        else if(!lval->isBase() && !rval->isBase()) flag = (lval->type == rval->type);
-        return flag;
-    }
+    static bool typeCheck(Var* lval, Var* rval);
     //
     Var* genTwoOp(Var* lval, Tag opt, Var* rval);
     Var* genOr(Var* lval, Var* rval);
@@ -215,6 +213,54 @@ public:
     // 
     void genPara(Var* arg);
     Var* genCall(Fun* function, vector<Var*>& args);
+    //
+    // 产生else标签
+    // OP_JF cond _else
+    void genIfHead(Var* cond, InterInst*& _else);
+    // 无else
+    // _else:
+    void genIfTail(InterInst*& _else);
+    // 有else
+    // 产生exit标签
+    // OP_JMP _exit
+    // _else:
+    void genElseHead(InterInst* _else, InterInst*& _exit);
+    // _exit:
+    void genElseTail(InterInst*& _exit);
+    //
+    static string genLb();
+    // 
+    // 产生_exit标签，为其内部的break提供信息
+    void genSwitchHead(InterInst*& _exit);
+    // OP_JMP _exit
+    void genSwitchTail(InterInst*& _exit);
+    // 产生_case_exit标签，为其内部的break提供信息
+    // OP_JNE cond lb _case_exit
+    void genCaseHead(Var* cond, Var* lb, InterInst*& _case_exit);
+    // _case_exit:
+    void genCaseTail(InterInst* _case_exit);
+    // 
+    // 中间的部分需要用到_exit-注册、放置_while，注册_exit
+    void genWhileHead(InterInst*& _while, InterInst* _exit);
+    // 为false跳转到结尾，否则执行genWhileTail，跳转到开头
+    void genWhileCond(Var* cond, InterInst* _exit);
+    void genWhileTail(InterInst*& _while, InterInst*& _exit);
+    // 
+    void genDoWhileHead(InterInst*& _do, InterInst* _exit);
+    // 为true跳转到开头
+    void genDoWhileTail(Var* cond, InterInst*& _do, InterInst*& _exit);
+    // 
+    void genForHead(InterInst*& _for, InterInst*& _exit);
+    void genForCondBegin(Var* cond, InterInst*& _step, InterInst*& _block, InterInst* _exit);
+    void genForCondEnd(InterInst* _for, InterInst* _block);
+    void genForTail(InterInst*& _step, InterInst*& _exit);
+    // 
+    vector<InterInst*> heads;
+    vector<InterInst*> tails;
+    void push(InterInst* head, InterInst* tail);
+    void pop();
+    void genBreak();
+    void genContinue();
 };
 enum Operator{
     OP_NOP,
@@ -239,6 +285,7 @@ enum Operator{
 //中间代码层-四元组
 class InterInst {
 public:
+    // 标签
     string label;
     Operator op;
     Var* result;
@@ -246,10 +293,12 @@ public:
     Var* arg2;
     Fun* fun;
     InterInst* target;
+    //生成一个随机的标签
     InterInst();
     InterInst(Operator op, Var* var);
     InterInst(Operator op, Fun* fun);
     InterInst(Operator op, Fun* fun, Var* ret);
+    InterInst(Operator op, InterInst* interInst, Var* var2, Var* var3);
     InterInst(Operator op, InterInst* interInst, Var* var);
     InterInst(Operator op, InterInst* interInst);
     InterInst(Operator op, Var* var1, Var* var2);

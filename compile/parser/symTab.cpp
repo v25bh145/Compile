@@ -37,11 +37,10 @@ void SymTab::addVar(Var* var) {
             delete var;
             return;
         }
-        //TODO GenCode
-        // if(ir) {
-        //     int flag = ir->genVarInit(var);
-        //     if(curFun && flag) curFun->locate(var);
-        // }
+        if(ir) {
+            int flag = ir->genVarInit(var);
+            if(curFun && flag) curFun->locate(var);
+        }
 
     }
 }
@@ -133,12 +132,10 @@ void SymTab::defFun(Fun* fun) {
         fun = last;
     }
     curFun = fun;
-    // TODO ir
-    // ir->getFunHead(curFun);
+    ir->genFunHead(curFun);
 }
 void SymTab::endDefFun() {
-    // TODO ir
-    // ir->genFunTail(curFun);
+    ir->genFunTail(curFun);
     curFun = NULL;
 }
 //给变量设置类型 & 类型检查
@@ -252,9 +249,17 @@ bool Var::isRef() {
     return (this->isPtr || this->isArray);
 }
 // 猜测: 返回一个void变量
-// Var* Var::getVoid() {
-//     return;
-// }
+Var* Var::getVoid() {
+    Var* var = new Var();
+    var->type = KW_VOID;
+    return var;
+}
+Var* Var::getTrue() {
+    Var* var = new Var();
+    var->type = KW_INT;
+    var->intVal = 1;
+    return var;
+}
 Fun* SymTab::getFun(string name, vector<Var*>& args) {
     if(funTab.find(name) != funTab.end()) {
         Fun* last = funTab[name];
