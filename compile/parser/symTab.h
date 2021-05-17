@@ -8,8 +8,16 @@
 #include <unordered_map>
 #include <vector>
 using namespace std;
+
+class SymTab;
+class Var;
+class Fun;
+class InterInst;
+class GenIR;
+
 class SymTab {
 public:
+    SymTab();
     struct string_hash {
         size_t operator() (const string& str) const {
             hash<string> hash_string;
@@ -27,9 +35,7 @@ public:
     int scopeId;
     //ir
     GenIR* ir;
-    void bindIr(GenIR* ir) {
-        this->ir = ir;
-    }
+    void bindIr(GenIR* ir);
     //作用域路径
     vector<int> scopePath;
     void enter();
@@ -43,9 +49,12 @@ public:
     void defFun(Fun* fun);
     void endDefFun();
     Fun* getFun(string name, vector<Var*>& args);
-    //self
-    //TODO impl
+    // self
     void addInst(InterInst* inst);
+    // self
+    vector<InterInst*> instList;
+    static Var* one;
+    static Var* four;
 };
 //变量/常量
 class Var {
@@ -93,22 +102,13 @@ public:
     Var(vector<int> scopePath, bool isExtern, Tag tag, bool isPtr, string id, Var* initVal);
     //常量的构造函数
     Var(Token* it);
-    //TODO 中间变量的构造函数
+    //中间变量的构造函数
     Var(vector<int> scopePath, Tag tag, bool isExtern);
     Var(vector<int> scopePath, Var* initVal);
     void setType(Tag t);
     void setArray(int len);
     bool setInit();
-    static Var* getStep(Var* val) {
-        // TODO SymTab::one SymTab::four
-        // 基本类型（非指针）
-        // if(val->isBase()) return SymTab::one;
-        // char* 类型
-        // else if(val->type == KW_CHAR) return SymTab::one;
-        // int* 类型
-        // else if(val->type == KW_INT)return SymTab::four;
-        // else return NULL;
-    }
+    static Var* getStep(Var* val);
     //self
     bool isVoid();
     bool isBase();
@@ -147,28 +147,17 @@ public:
     bool match(vector<Var*>& args);
     //这个函数的定义(当只有声明体的函数碰到定义时调用)
     void define(Fun* def);
-    Fun(bool isExtern, Tag tag, string name, vector<Var*> paraList) {
-        this->isExtern = isExtern;
-        this->type = tag;
-        this->name = name;
-        this->paraVar = paraVar;
-    }
-    //self
-    // TODO impl
-    InterInst* getReturnPoint();
+    Fun(bool isExtern, Tag tag, string name, vector<Var*> paraList);
 };
 //代码生成的辅助函数
 class GenIR {
-private:
-    static int lbNum;
 public:
-    GenIR() {GenIR::lbNum = 0;}
+    static int lbNum;
+    GenIR();
 // TODO init file
     FILE* file;
     SymTab* symTab;
-    void bindSymTab(SymTab* symTab) {
-        this->symTab = symTab;
-    }
+    void bindSymTab(SymTab* symTab);
     GenIR(SymTab* symTab);
     bool genVarInit(Var* var);
     void genReturn(Var* ret);
@@ -180,7 +169,7 @@ public:
     Var* genAssign(Var* val);
     //操作为lval = rval，返回lval
     Var* genAssign(Var* lval, Var* rval);
-    bool typeCheck(Var* lval, Var* rval);
+    // bool typeCheck(Var* lval, Var* rval);
     static bool typeCheck(Var* lval, Var* rval);
     //
     Var* genTwoOp(Var* lval, Tag opt, Var* rval);
@@ -197,7 +186,6 @@ public:
     Var* genMul(Var* lval, Var* rval);
     Var* genDiv(Var* lval, Var* rval);
     Var* genMod(Var* lval, Var* rval);
-    Var* getStep(Var* v);
     //
     Var* genOneOpLeft(Tag opt, Var* val);
     Var* genIncL(Var* val);

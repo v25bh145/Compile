@@ -1,5 +1,5 @@
 cc = g++
-parserObject = parserMatcher.o parserScanner.o nonterminalMap.o symTab.o genIR.o
+parserObject = parserMatcher.o parserScanner.o nonterminalMap.o symTab.o genIR.o interInst.o semError.o
 parserPath = $(PWD)/compile/parser
 
 parserMain.o: $(parserObject) $(parserPath)/parserMain.cpp
@@ -19,3 +19,9 @@ symTab.o: $(parserPath)/symTab.cpp
 
 genIR.o: $(parserPath)/genIR.cpp
 	$(cc) -c $(parserPath)/genIR.cpp
+
+interInst.o: $(parserPath)/interInst.cpp
+	$(cc) -c $(parserPath)/interInst.cpp
+
+semError.o: $(parserPath)/semError.cpp
+	$(cc) -c $(parserPath)/semError.cpp

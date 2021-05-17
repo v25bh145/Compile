@@ -1,9 +1,13 @@
 #include "symTab.h"
 #include "semError.h"
 using namespace std;
+int GenIR::lbNum = 0;
+GenIR::GenIR() {}
 GenIR::GenIR(SymTab* symTab) {
     this->symTab = symTab;
-    GenIR::lbNum = 0;
+}
+void GenIR::bindSymTab(SymTab* symTab) {
+    this->symTab = symTab;
 }
 bool GenIR::genVarInit(Var* var) {
     //处理整型、字符型常量的Var对象，他们不需要初始化
@@ -19,11 +23,16 @@ void GenIR::genReturn(Var* ret) {
     Fun* fun = symTab->curFun;
     // 返回值不是void，则不能返回void; 返回值是void，则只能返回void
     if(ret->isVoid() && fun->type != KW_VOID || ret->isBase() && fun->type == KW_VOID) {
+        if(ret->isVoid() && fun->type != KW_VOID) {
+            cout<<fun->type<<endl;
+            cout<<ret->type<<endl;
+            cout<<"?"<<endl;
+        }
         // 错误处理
         SEMERROR(RETURN_ERR, fun->name);
         return;
     } 
-    InterInst* returnPoint = fun->getReturnPoint();
+    InterInst* returnPoint = fun->returnPoint;
     if(ret->isVoid()) {
         symTab->addInst(new InterInst(OP_RET, returnPoint));
     }
@@ -91,7 +100,7 @@ Var* GenIR::genAssign(Var* lval, Var* rval) {
         return lval;
     }
     // typeCheck
-    if(!typeCheck(lval, rval)) {
+    if(!GenIR::typeCheck(lval, rval)) {
         SEMERROR(ASSIGN_TYPE_ERR, rval->name);
         return rval;
     }

@@ -37,7 +37,7 @@ matchInfo Parser::program(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(PROGRAM);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     auto segmentRes = segment(son);
@@ -63,7 +63,7 @@ matchInfo Parser::segment(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(SEGMENT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     bool isExtern = false;
@@ -98,15 +98,15 @@ matchInfo Parser::type(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(TYPE);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     Tag tag;
     //terminal
     if(scan()->tag == KW_INT || scan()->tag == KW_VOID || scan()->tag == KW_CHAR) {
+        tag = scan()->tag;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
-        tag = scan()->tag;
     } else {
         tokenIterator = last;
         return {false, "(KW_INT | KW_VOID | KW_CHAR)"};
@@ -124,7 +124,7 @@ matchInfo Parser::def(Nonterminal* father, bool isExtern, Tag tag) {
     Nonterminal* son = new Nonterminal(DEF);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     string id;
@@ -183,7 +183,7 @@ matchInfo Parser::idtail(Nonterminal* father, bool isExtern, Tag tag, string id)
     Nonterminal* son = new Nonterminal(IDTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     bool secondFlag = false;
     auto varrdefRes = varrdef(son, isExtern, tag, id);
@@ -249,7 +249,7 @@ matchInfo Parser::init(Nonterminal* father, bool isExtern, Tag tag, string id, b
     Nonterminal* son = new Nonterminal(INIT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == ASSIGN) {
@@ -284,7 +284,7 @@ matchInfo Parser::deflist(Nonterminal* father, bool isExtern, Tag tag) {
     Nonterminal* son = new Nonterminal(DEFLIST);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == COMMA) {
@@ -328,7 +328,7 @@ matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id
     Nonterminal* son = new Nonterminal(VARRDEF);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == LBRACK) {
@@ -373,7 +373,7 @@ matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id
     father->setChild(son);
     return {true, ""};
 }
-// TODO: 我要TODO啥来着，真想做时光机到过去把我鲨了
+// TODO: 我要干啥来着，真想做时光机到过去把我鲨了
 //return paraList
 matchInfo Parser::para(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -382,7 +382,7 @@ matchInfo Parser::para(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(PARA);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto typeRes = type(son);
@@ -419,7 +419,7 @@ matchInfo Parser::funtail(Nonterminal* father, bool isExtern, Tag tag, string id
     Nonterminal* son = new Nonterminal(FUNTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     Fun* fun = new Fun(isExtern, tag, id, paraList);
     //terminal
@@ -452,7 +452,7 @@ matchInfo Parser::expr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(EXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto assexprRes = assexpr(son);
@@ -473,7 +473,7 @@ matchInfo Parser::altexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ALTEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     matchInfo result = {true, ""};
     // TODO EXPR_FIRST
@@ -486,7 +486,7 @@ matchInfo Parser::altexpr(Nonterminal* father) {
         }
         result.var = exprRes.var;
     // } else {
-        result.var = Var::getVoid();
+        // result.var = Var::getVoid();
     // }
 
     //匹配成功，装载节点
@@ -500,7 +500,7 @@ matchInfo Parser::defdata(Nonterminal* father, bool isExtern, Tag tag) {
     Nonterminal* son = new Nonterminal(DEFDATA);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     string id;
@@ -548,7 +548,7 @@ matchInfo Parser::paradata(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(PARADATA);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == MUL) {
@@ -591,7 +591,7 @@ matchInfo Parser::paradatatail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(PARADATATAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == LBRACK) {
@@ -635,7 +635,7 @@ matchInfo Parser::paralist(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(PARALIST);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == COMMA) {
@@ -682,7 +682,7 @@ matchInfo Parser::block(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(BLOCK);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == LBRACE) {
@@ -722,10 +722,11 @@ matchInfo Parser::assexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ASSEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto orexprRes = orexpr(son);
+    cout<<"                 "<<orexprRes.var->name<<endl;
     matchInfo asstailRes;
     if(orexprRes.status) {
         //nonterminal
@@ -744,13 +745,18 @@ matchInfo Parser::assexpr(Nonterminal* father) {
     return asstailRes;
 }
 matchInfo Parser::orexpr(Nonterminal* father) {
+    // TODO orexpr以及之后的函数
+    // 没有添加genTwoOp以及一个运算符的gen
+    // 注意看书的P113页，有说ass的怎么写
+    // 左结合即 a = b = c => a = ( b = c )
+    // 右结合即 a + b + c => ( a + b ) + c
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
     Nonterminal* son = new Nonterminal(OREXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto andexprRes = andexpr(son);
@@ -777,7 +783,7 @@ matchInfo Parser::andexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ANDEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto cmpexprRes = cmpexpr(son);
@@ -804,7 +810,7 @@ matchInfo Parser::cmpexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(CMPEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto aloexprRes = aloexpr(son);
@@ -831,7 +837,7 @@ matchInfo Parser::aloexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ALOEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto itemRes = item(son);
@@ -858,7 +864,7 @@ matchInfo Parser::item(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ITEM);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto factorRes = factor(son);
@@ -886,7 +892,7 @@ matchInfo Parser::factor(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(FACTOR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     bool secondFlag = false;
     //nonterminal
@@ -929,9 +935,12 @@ matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
     Nonterminal* son = new Nonterminal(ASSTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     matchInfo result = {true, ""};
+    cout<<"?"<<endl;
+    cout<<"?"<<lval->name<<endl;
+    result.var = lval;
     //terminal
     if(scan()->tag == ASSIGN) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -954,14 +963,13 @@ matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
         } else {
             //terminal
             tokenIterator = last;
-            
+
         }
     } else {
         //terminal
         tokenIterator = last;
         
     }
-
     //匹配成功，装载节点
     father->setChild(son);
     return result;
@@ -973,7 +981,7 @@ matchInfo Parser::ortail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ORTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == OR) {
@@ -1012,7 +1020,7 @@ matchInfo Parser::andtail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ANDTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == AND) {
@@ -1051,7 +1059,7 @@ matchInfo Parser::cmptail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(CMPTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto cmpsRes = cmps(son);
@@ -1088,7 +1096,7 @@ matchInfo Parser::alotail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ALOTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto addsRes = adds(son);
@@ -1125,7 +1133,7 @@ matchInfo Parser::itemtail(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ITEMTAIL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto mulsRes = muls(son);
@@ -1162,7 +1170,7 @@ matchInfo Parser::cmps(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(CMPS);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == GT || scan()->tag == GE || scan()->tag == LT || scan()->tag == LE || scan()->tag == EQU || scan()->tag == NEQU) {
@@ -1185,7 +1193,7 @@ matchInfo Parser::adds(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ADDS);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == ADD || scan()->tag == SUB) {
@@ -1208,7 +1216,7 @@ matchInfo Parser::muls(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(MULS);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == MUL || scan()->tag == DIV || scan()->tag == MOD) {
@@ -1231,7 +1239,7 @@ matchInfo Parser::lop(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(CMPS);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == NOT || scan()->tag == SUB || scan()->tag == MUL || scan()->tag == INC || scan()->tag == DEC) {
@@ -1254,7 +1262,7 @@ matchInfo Parser::rop(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ROP);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == INC || scan()->tag == DEC) {
@@ -1277,7 +1285,7 @@ matchInfo Parser::val(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(VAL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto elemRes = elem(son);
@@ -1306,7 +1314,7 @@ matchInfo Parser::elem(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ELEM);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     bool secondFlag = false;
     switch(scan()->tag) {
@@ -1370,7 +1378,7 @@ matchInfo Parser::idexpr(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(IDEXPR);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == LBRACK) {
@@ -1435,7 +1443,7 @@ matchInfo Parser::realarg(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(REALARG);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto argRes = arg(son);
@@ -1464,7 +1472,7 @@ matchInfo Parser::arg(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ARG);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto exprRes = expr(son);
@@ -1485,7 +1493,7 @@ matchInfo Parser::arglist(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ARGLIST);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == COMMA) {
@@ -1525,7 +1533,7 @@ matchInfo Parser::literal(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(LITERAL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     Token* token = scan();
@@ -1542,6 +1550,7 @@ matchInfo Parser::literal(Nonterminal* father) {
                 symTab.addStr(var);
             } else {
                 symTab.addVar(var);
+                cout<<"literal "<<var->type<<endl;
             }
             break;
         }
@@ -1563,7 +1572,7 @@ matchInfo Parser::subprogram(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(SUBPROGRAM);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     bool secondFlag = false;
     //nonterminal
@@ -1609,7 +1618,7 @@ matchInfo Parser::localdef(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(LOCALDEF);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto typeRes = type(son);
@@ -1646,7 +1655,7 @@ matchInfo Parser::statement(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(STATEMENT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //NO NEED TO USE FLAG
     switch(scan()->tag) {
@@ -1690,6 +1699,7 @@ matchInfo Parser::statement(Nonterminal* father) {
             //nonterminal
             auto altexprRes = altexpr(son);
             if(altexprRes.status) {
+                cout<<altexprRes.var->name<<endl;
                 ir.genReturn(altexprRes.var);
                 //terminal
                 if(scan()->tag == SEMICON) {
@@ -1768,7 +1778,7 @@ matchInfo Parser::whilestat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(WHILESTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
     
     //terminal
     if(scan()->tag == KW_WHILE) {
@@ -1830,7 +1840,7 @@ matchInfo Parser::dowhilestat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(DOWHILESTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     symTab.enter();
     //terminal
@@ -1910,7 +1920,7 @@ matchInfo Parser::forstat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(FORSTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     
     //terminal
@@ -2000,7 +2010,7 @@ matchInfo Parser::forinit(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(FORINIT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto localdefRes = localdef(son);
@@ -2039,7 +2049,7 @@ matchInfo Parser::ifstat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(IFSTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     InterInst *_else, *_exit;
 
@@ -2114,7 +2124,7 @@ matchInfo Parser::elsestat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(ELSESTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == KW_ELSE) {
@@ -2148,7 +2158,7 @@ matchInfo Parser::switchstat(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(SWITCHSTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //terminal
     if(scan()->tag == KW_SWITCH) {
@@ -2230,7 +2240,7 @@ matchInfo Parser::casestat(Nonterminal* father, Var* cond) {
     Nonterminal* son = new Nonterminal(CASESTAT);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     switch(scan()->tag) {
         //terminal
@@ -2309,7 +2319,7 @@ matchInfo Parser::caselabel(Nonterminal* father) {
     Nonterminal* son = new Nonterminal(CASELABEL);
     //创建历史纪录，以便出现匹配失败时回溯到匹配前
     list<Token*>::iterator last = tokenIterator;
-    //cout<<son->toString()<<endl;
+    cout<<son->toString()<<endl;
 
     //nonterminal
     auto literalRes = literal(son);

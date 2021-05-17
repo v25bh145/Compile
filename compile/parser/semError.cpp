@@ -1,7 +1,7 @@
 #include <iostream>
 #include "semError.h"
 using namespace std;
-int errorNum = 0, warnNum = 0;
+int semErrorNum = 0, warnNum = 0;
 void semError(int code, string name) {
     const char* semErrorTable[] = {
         "变量重定义",
@@ -26,7 +26,7 @@ void semError(int code, string name) {
         "continue不能出现在函数之外",
         "return语句和函数返回值类型不匹配"
     };
-    errorNum++;
+    semErrorNum++;
     printf("语义错误: %s %s.\n", name.c_str(), semErrorTable[code]);
 }
 void semWarn(int code, string name) {

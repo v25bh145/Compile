@@ -19,7 +19,6 @@ struct matchInfo {
 
 class Parser {
     private:
-    // TODO init ir
         GenIR ir;
         Nonterminal* parserRoot;
         list<Token*> tokenList;
@@ -51,7 +50,7 @@ class Parser {
         matchInfo localdef(Nonterminal* father);
         matchInfo statement(Nonterminal* father);
         matchInfo assexpr(Nonterminal* father);
-        matchInfo Parser::asstail(Nonterminal* father, Var* lval);
+        matchInfo asstail(Nonterminal* father, Var* lval);
         matchInfo orexpr(Nonterminal* father);
         matchInfo ortail(Nonterminal* father);
         matchInfo andexpr(Nonterminal* father);

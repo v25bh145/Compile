@@ -1,6 +1,15 @@
 #include "symTab.h"
 #include "semError.h"
 using namespace std;
+Var* SymTab::one = new Var();
+Var* SymTab::four = new Var();
+SymTab::SymTab() {
+    curFun = NULL;
+
+}
+void SymTab::bindIr(GenIR* ir) {
+    this->ir = ir;
+}
 void SymTab::enter() {
     scopeId++;
     scopePath.push_back(scopeId);
@@ -24,6 +33,7 @@ void SymTab::addVar(Var* var) {
         //寻找变量的作用域
         int i;
         for(i = 0; i < list.size(); i++) {
+            if(list[i]->scopePath.size() == 0 && var->scopePath.size() == 0) continue;
             if(list[i]->scopePath.back() == var->scopePath.back()) {
                 break;
             }
@@ -41,7 +51,6 @@ void SymTab::addVar(Var* var) {
             int flag = ir->genVarInit(var);
             if(curFun && flag) curFun->locate(var);
         }
-
     }
 }
 //添加字串常量-传引用
@@ -112,7 +121,7 @@ void SymTab::defFun(Fun* fun) {
     //前面没有声明过这个函数
     if(funTab.find(fun->name) == funTab.end()) {
         funTab[fun->name] = fun;
-        // TODO ?
+        // TODO IGNORE THIS
         // funList.push_back(fun->name);
     } else {
         Fun* last = funTab[fun->name];
@@ -138,6 +147,9 @@ void SymTab::endDefFun() {
     ir->genFunTail(curFun);
     curFun = NULL;
 }
+void SymTab::addInst(InterInst* inst) {
+    instList.push_back(inst);
+}
 //给变量设置类型 & 类型检查
 void Var::setType(Tag t) {
     this->type = t;
@@ -161,6 +173,15 @@ void Var::setArray(int len) {
     arraySize = len;
     if(!isExtern) size *= len;
 }
+Var* Var::getStep(Var* val) {
+    // 基本类型（非指针）
+    if(val->isBase()) return SymTab::one;
+    // char* 类型
+    else if(val->type == KW_CHAR) return SymTab::one;
+    // int* 类型
+    else if(val->type == KW_INT)return SymTab::four;
+    else return NULL;
+}
 //数组的构造函数
 Var::Var(vector<int> scopePath, bool isExtern, Tag tag, string id, int len) {
     this->scopePath = scopePath;
@@ -180,6 +201,7 @@ Var::Var(vector<int> scopePath, bool isExtern, Tag tag, bool isPtr, string id, V
 }
 //常量的构造函数
 Var::Var(Token* it) {
+    // TODO clear
     // clear(); ??
     this->isLiteral = true;
     this->isLeft = false;
@@ -206,6 +228,18 @@ Var::Var(Token* it) {
             break;
         }
     }
+}
+Var::Var(vector<int> scopePath, Tag tag, bool isExtern) {
+    this->scopePath = scopePath;
+    this->type = tag;
+    this->isExtern = isExtern;
+}
+Var::Var(vector<int> scopePath, Var* initVal) {
+    this->scopePath = scopePath;
+    this->initData = initVal;
+}
+Var::Var() {
+
 }
 //返回值: 返回true，则需要先计算表达式的值后再对局部变量进行初始化，否则不需要。
 bool Var::setInit() {
@@ -259,6 +293,12 @@ Var* Var::getTrue() {
     var->type = KW_INT;
     var->intVal = 1;
     return var;
+}
+Fun::Fun(bool isExtern, Tag tag, string name, vector<Var*> paraList) {
+    this->isExtern = isExtern;
+    this->type = tag;
+    this->name = name;
+    this->paraVar = paraVar;
 }
 Fun* SymTab::getFun(string name, vector<Var*>& args) {
     if(funTab.find(name) != funTab.end()) {
