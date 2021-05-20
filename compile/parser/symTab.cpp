@@ -22,6 +22,7 @@ void SymTab::leave() {
 }
 //添加变量/常量(不包含字串常量)
 void SymTab::addVar(Var* var) {
+    cout<<">debug add var"<<var->name<<endl;
     if(varTab.find(var->name) == varTab.end()) {
         //不同名变量
         varTab[var->name] = new vector<Var*>;
@@ -33,7 +34,7 @@ void SymTab::addVar(Var* var) {
         //寻找变量的作用域
         int i;
         for(i = 0; i < list.size(); i++) {
-            if(list[i]->scopePath.size() == 0 && var->scopePath.size() == 0) continue;
+            if(list[i]->scopePath.size() == 0 || var->scopePath.size() == 0) continue;
             if(list[i]->scopePath.back() == var->scopePath.back()) {
                 break;
             }
@@ -229,11 +230,27 @@ Var::Var(Token* it) {
         }
     }
 }
+// 不明所以，中间变量？
 Var::Var(vector<int> scopePath, Tag tag, bool isExtern) {
+    cout<<"?"<<tag<<endl;
+    switch(tag) {
+        case KW_INT: {
+            this->setType(KW_INT);
+            this->name = "<int>";
+            break;
+        }
+        case KW_CHAR: {
+            this->setType(KW_CHAR);
+            this->name = "<char>";
+            this->intVal = 0;
+            break;
+        }
+    }
     this->scopePath = scopePath;
     this->type = tag;
     this->isExtern = isExtern;
 }
+// self: 深拷贝？
 Var::Var(vector<int> scopePath, Var* initVal) {
     this->scopePath = scopePath;
     this->initData = initVal;
@@ -304,6 +321,14 @@ Fun* SymTab::getFun(string name, vector<Var*>& args) {
     if(funTab.find(name) != funTab.end()) {
         Fun* last = funTab[name];
         if(!last->match(args)) {
+            cout<<"形参"<<endl;
+            for(auto p = args.begin(); p != args.end(); ++p) {
+                cout<<"参数 "<<(*p)->type<<" "<<(*p)->name<<endl;
+            }
+            cout<<"实参"<<endl;
+            for(auto p = last->paraVar.begin(); p != last->paraVar.end(); ++p) {
+                cout<<"参数 "<<(*p)->type<<" "<<(*p)->name<<endl;
+            }
             // 错误处理
             SEMERROR(FUN_CALL_ERR, name);
             return NULL;

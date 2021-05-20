@@ -79,6 +79,7 @@ Var* GenIR::genLea(Var* val) {
         tmp = new Var(symTab->scopePath, val->type, true);
         symTab->addVar(tmp);
         symTab->addInst(new InterInst(OP_LEA, tmp, val));
+        return tmp;
     }
 }
 //将指针运算结果作为右值
@@ -120,6 +121,7 @@ bool GenIR::typeCheck(Var* lval, Var* rval) {
     return flag;
 }
 Var* GenIR::genTwoOp(Var* lval, Tag opt, Var* rval) {
+    cout<<"============"<<endl;
     if(!lval || !rval) return NULL;
 
     if(lval->isVoid() || rval->isVoid()) {
@@ -166,7 +168,9 @@ Var* GenIR::genAdd(Var* lval, Var* rval) {
         return lval;
     }
     symTab->addVar(tmp);
+    cout<<"=="<<endl;
     symTab->addInst(new InterInst(OP_ADD, tmp, lval, rval));
+    return tmp;
 }
 Var* GenIR::genSub(Var* lval, Var* rval) {
     Var* tmp = NULL;
@@ -183,6 +187,7 @@ Var* GenIR::genSub(Var* lval, Var* rval) {
     }
     symTab->addVar(tmp);
     symTab->addInst(new InterInst(OP_SUB, tmp, lval, rval));
+    return tmp;
 }
 Var* GenIR::genMul(Var* lval, Var* rval) {
     Var* tmp = new Var(symTab->scopePath, KW_INT, false);
@@ -301,11 +306,13 @@ Var* GenIR::genMinus(Var* val) {
     Var* tmp = new Var(symTab->scopePath, KW_INT, false);
     symTab->addVar(tmp);
     symTab->addInst(new InterInst(OP_NEG, tmp, val));
+    return tmp;
 }
 Var* GenIR::genNot(Var* val) {
     Var* tmp = new Var(symTab->scopePath, KW_INT, false);
     symTab->addVar(tmp);
     symTab->addInst(new InterInst(OP_NOT, tmp, val));
+    return tmp;
 }
 
 /* 处理单目后缀运算符表达式 */

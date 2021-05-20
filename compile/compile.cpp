@@ -24,6 +24,6 @@ int Compile(char* filePath) {
     Parser* parser = new Parser(tokenList);
     Nonterminal *root = parser->run();
 
-    cout<<"======词法数分析======"<<endl;
-    parser->print(root, 0);
+    // cout<<"======词法数分析======"<<endl;
+    // parser->print(root, 0);
 }

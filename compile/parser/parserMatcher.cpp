@@ -373,7 +373,8 @@ matchInfo Parser::varrdef(Nonterminal* father, bool isExtern, Tag tag, string id
     father->setChild(son);
     return {true, ""};
 }
-// TODO: 我要干啥来着，真想做时光机到过去把我鲨了
+// TODO: 
+// 我要干啥来着，真想做时光机到过去把我鲨了
 //return paraList
 matchInfo Parser::para(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -726,7 +727,8 @@ matchInfo Parser::assexpr(Nonterminal* father) {
 
     //nonterminal
     auto orexprRes = orexpr(son);
-    cout<<"                 "<<orexprRes.var->name<<endl;
+    // if(orexprRes.var != NULL)
+        // cout<<"                 "<<orexprRes.var->name<<endl;
     matchInfo asstailRes;
     if(orexprRes.status) {
         //nonterminal
@@ -745,7 +747,6 @@ matchInfo Parser::assexpr(Nonterminal* father) {
     return asstailRes;
 }
 matchInfo Parser::orexpr(Nonterminal* father) {
-    // TODO orexpr以及之后的函数
     // 没有添加genTwoOp以及一个运算符的gen
     // 注意看书的P113页，有说ass的怎么写
     // 左结合即 a = b = c => a = ( b = c )
@@ -758,11 +759,14 @@ matchInfo Parser::orexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo ortailRes;
     //nonterminal
     auto andexprRes = andexpr(son);
     if(andexprRes.status) {
         //nonterminal
-        auto ortailRes = ortail(son);
+        // if(andexprRes.var != NULL)
+            // cout<<"??? and"<<andexprRes.var->name<<endl;
+        ortailRes = ortail(son, andexprRes.var);
         if(!ortailRes.status) {
             tokenIterator = last;
             return {false, "ortail > " + ortailRes.info};
@@ -774,7 +778,7 @@ matchInfo Parser::orexpr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return ortailRes;
 }
 matchInfo Parser::andexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -785,11 +789,12 @@ matchInfo Parser::andexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo andtailRes;
     //nonterminal
     auto cmpexprRes = cmpexpr(son);
     if(cmpexprRes.status) {
         //nonterminal
-        auto andtailRes = andtail(son);
+        andtailRes = andtail(son, cmpexprRes.var);
         if(!andtailRes.status) {
             tokenIterator = last;
             return {false, "andtail > " + andtailRes.info};
@@ -801,7 +806,7 @@ matchInfo Parser::andexpr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return andtailRes;
 }
 matchInfo Parser::cmpexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -812,11 +817,12 @@ matchInfo Parser::cmpexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo cmptailRes;
     //nonterminal
     auto aloexprRes = aloexpr(son);
     if(aloexprRes.status) {
         //nonterminal
-        auto cmptailRes = cmptail(son);
+        cmptailRes = cmptail(son, aloexprRes.var);
         if(!cmptailRes.status) {
             tokenIterator = last;
             return {false, "cmptail > " + cmptailRes.info};
@@ -828,7 +834,7 @@ matchInfo Parser::cmpexpr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return cmptailRes;
 }
 matchInfo Parser::aloexpr(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -839,11 +845,12 @@ matchInfo Parser::aloexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo alotailRes;
     //nonterminal
     auto itemRes = item(son);
     if(itemRes.status) {
         //nonterminal
-        auto alotailRes = alotail(son);
+        alotailRes = alotail(son, itemRes.var);
         if(!alotailRes.status) {
             tokenIterator = last;
             return {false, "alotail > " + alotailRes.info};
@@ -855,7 +862,7 @@ matchInfo Parser::aloexpr(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return alotailRes;
 }
 matchInfo Parser::item(Nonterminal* father) {
     //如果词记号到头，则直接返回
@@ -866,11 +873,12 @@ matchInfo Parser::item(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo itemtailRes;
     //nonterminal
     auto factorRes = factor(son);
     if(factorRes.status) {
         //nonterminal
-        auto itemtailRes = itemtail(son);
+        itemtailRes = itemtail(son, factorRes.var);
         if(!itemtailRes.status) {
             tokenIterator = last;
             return {false, "itemtail > " + itemtailRes.info};
@@ -879,12 +887,15 @@ matchInfo Parser::item(Nonterminal* father) {
         tokenIterator = last;
         return {false, "factor > " + factorRes.info}; 
     }
-
+    cout<<"     item";
+    if(itemtailRes.var != NULL)
+        cout<<itemtailRes.var->name<<endl;
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return itemtailRes;
 }
 //fix
+// 递归处理Var返回
 matchInfo Parser::factor(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -894,6 +905,7 @@ matchInfo Parser::factor(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     bool secondFlag = false;
     //nonterminal
     auto lopRes = lop(son);
@@ -907,7 +919,16 @@ matchInfo Parser::factor(Nonterminal* father) {
             if(!valRes.status) {
                 tokenIterator = last;
                 secondFlag = true;
+            } else {
+                // lop * 1 + val
+                // val返回的var和lop返回的运算符做op操作，返回var
+                returnRes.var = ir.genOneOpLeft(lopRes.tag, valRes.var);
             }
+
+        } else {
+            // lop * n + val
+            // factor返回的var和lop返回的运算符做op操作，返回var
+            returnRes.var = ir.genOneOpLeft(lopRes.tag, factorRes.var);
         }
     } else {  
         tokenIterator = last;
@@ -915,16 +936,21 @@ matchInfo Parser::factor(Nonterminal* father) {
     }
     if(secondFlag) {
         //nonterminal
+        // 直接返回var
         auto valRes = val(son);
         if(!valRes.status) {
             tokenIterator = last;
             return {false, "(val | lop) > " + valRes.info};
+        } else {
+            returnRes.var = valRes.var;
         }
     }
-
+    cout<<"     factor";
+    if(returnRes.var != NULL)
+        cout<<returnRes.var->name<<endl;
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
 //args revised
 //return revised
@@ -938,8 +964,6 @@ matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
     cout<<son->toString()<<endl;
 
     matchInfo result = {true, ""};
-    cout<<"?"<<endl;
-    cout<<"?"<<lval->name<<endl;
     result.var = lval;
     //terminal
     if(scan()->tag == ASSIGN) {
@@ -956,6 +980,7 @@ matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
             if(!asstailRes.status) {
                 //terminal
                 tokenIterator = last;
+                result.var = lval;
             } else {
                 // ir
                 result.var = ir.genTwoOp(lval, ASSIGN, asstailRes.var);
@@ -963,18 +988,18 @@ matchInfo Parser::asstail(Nonterminal* father, Var* lval) {
         } else {
             //terminal
             tokenIterator = last;
-
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
     //匹配成功，装载节点
     father->setChild(son);
     return result;
 }
-matchInfo Parser::ortail(Nonterminal* father) {
+matchInfo Parser::ortail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -983,6 +1008,7 @@ matchInfo Parser::ortail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == OR) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -991,29 +1017,31 @@ matchInfo Parser::ortail(Nonterminal* father) {
         //nonterminal
         auto andexprRes = andexpr(son);
         if(andexprRes.status) {
+            Var* resultVar = ir.genTwoOp(lval, OR, andexprRes.var);
             //nonterminal
-            auto ortailRes = ortail(son);
+            auto ortailRes = ortail(son, resultVar);
             if(!ortailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                result.var = lval;
+            } else {
+                result.var = ortailRes.var;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
-
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
-matchInfo Parser::andtail(Nonterminal* father) {
+matchInfo Parser::andtail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1022,6 +1050,7 @@ matchInfo Parser::andtail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == AND) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1030,29 +1059,32 @@ matchInfo Parser::andtail(Nonterminal* father) {
         //nonterminal
         auto cmpexprRes = cmpexpr(son);
         if(cmpexprRes.status) {
+            Var* resultVar = ir.genTwoOp(lval, AND, cmpexprRes.var);
             //nonterminal
-            auto andtailRes = andtail(son);
+            auto andtailRes = andtail(son, resultVar);
             if(!andtailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                result.var = lval;
+            } else {
+                result.var - andtailRes.var;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
-matchInfo Parser::cmptail(Nonterminal* father) {
+matchInfo Parser::cmptail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1061,35 +1093,39 @@ matchInfo Parser::cmptail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //nonterminal
     auto cmpsRes = cmps(son);
     if(cmpsRes.status) {
         //nonterminal
         auto aloexprRes = aloexpr(son);
         if(aloexprRes.status) {
+            Var* resultVar = ir.genTwoOp(lval, cmpsRes.tag, aloexprRes.var);
             //nonterminal
-            auto cmptailRes = cmptail(son);
+            auto cmptailRes = cmptail(son, resultVar);
             if(!cmptailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                result.var = lval;
+            } else {
+                result.var = cmptailRes.var;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
-matchInfo Parser::alotail(Nonterminal* father) {
+matchInfo Parser::alotail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1098,35 +1134,40 @@ matchInfo Parser::alotail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //nonterminal
     auto addsRes = adds(son);
     if(addsRes.status) {
         //nonterminal
         auto itemRes = item(son);
         if(itemRes.status) {
+            cout<<">debug alo gen"<<endl;
+            Var* resultVar = ir.genTwoOp(lval, addsRes.tag, itemRes.var);
             //nonterminal
-            auto alotailRes = alotail(son);
+            auto alotailRes = alotail(son, resultVar);
             if(!alotailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                result.var = lval;
+            } else {
+                result.var = alotailRes.var;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
-matchInfo Parser::itemtail(Nonterminal* father) {
+matchInfo Parser::itemtail(Nonterminal* father, Var* lval) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1135,34 +1176,40 @@ matchInfo Parser::itemtail(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //nonterminal
     auto mulsRes = muls(son);
     if(mulsRes.status) {
         //nonterminal
         auto factorRes = factor(son);
         if(factorRes.status) {
+            Var* resultVar = ir.genTwoOp(lval, mulsRes.tag, factorRes.var);
+            cout<<"============"<<endl;
             //nonterminal
-            auto itemtailRes = itemtail(son);
+            auto itemtailRes = itemtail(son, resultVar);
             if(!itemtailRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                result.var = lval;
+            } else {
+                result.var = itemtailRes.var;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            result.var = lval;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        result.var = lval;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
+// return tag
 matchInfo Parser::cmps(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1172,8 +1219,10 @@ matchInfo Parser::cmps(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == GT || scan()->tag == GE || scan()->tag == LT || scan()->tag == LE || scan()->tag == EQU || scan()->tag == NEQU) {
+        result.tag = scan()->tag;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1184,8 +1233,9 @@ matchInfo Parser::cmps(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
+// return tag
 matchInfo Parser::adds(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1195,8 +1245,10 @@ matchInfo Parser::adds(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == ADD || scan()->tag == SUB) {
+        result.tag = scan()->tag;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1207,8 +1259,9 @@ matchInfo Parser::adds(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
+// return tag
 matchInfo Parser::muls(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1218,8 +1271,10 @@ matchInfo Parser::muls(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo result = {true, ""};
     //terminal
     if(scan()->tag == MUL || scan()->tag == DIV || scan()->tag == MOD) {
+        result.tag = scan()->tag;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1230,8 +1285,9 @@ matchInfo Parser::muls(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return result;
 }
+// done return tag
 matchInfo Parser::lop(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1241,8 +1297,10 @@ matchInfo Parser::lop(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //terminal
     if(scan()->tag == NOT || scan()->tag == SUB || scan()->tag == MUL || scan()->tag == INC || scan()->tag == DEC) {
+        returnRes.tag = scan()->tag;
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
@@ -1253,9 +1311,10 @@ matchInfo Parser::lop(Nonterminal* father) {
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
-matchInfo Parser::rop(Nonterminal* father) {
+// return var
+matchInfo Parser::rop(Nonterminal* father, Var* var) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1264,20 +1323,23 @@ matchInfo Parser::rop(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //terminal
     if(scan()->tag == INC || scan()->tag == DEC) {
+        returnRes.var = ir.genOneOpRight(var, scan()->tag);
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
     } else {
         tokenIterator = last;
-        
+        returnRes.var = var;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
+// return var
 matchInfo Parser::val(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1287,11 +1349,13 @@ matchInfo Parser::val(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //nonterminal
     auto elemRes = elem(son);
     if(elemRes.status) {
         //nonterminal
-        auto ropRes = rop(son);
+        auto ropRes = rop(son, elemRes.var);
+        returnRes.var = ropRes.var;
         if(!ropRes.status) {
             tokenIterator = last;
             return {false, "rop > " + ropRes.info};
@@ -1300,13 +1364,16 @@ matchInfo Parser::val(Nonterminal* father) {
         tokenIterator = last;
         return {false, "elem > " + elemRes.info};
     }
-
+    cout<<"     var";
+    if(returnRes.var != NULL)
+        cout<<returnRes.var->name<<endl;
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
 //switch
 //fixed
+// return var
 matchInfo Parser::elem(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1316,23 +1383,34 @@ matchInfo Parser::elem(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     bool secondFlag = false;
     switch(scan()->tag) {
         //terminal
         case ID: {
+            cout<<"debug> id"<<endl;
+            // 有可能是变量，也有可能是函数名
+            // 变量也可能是函数数组
             Terminal* tagSon = new Terminal(scan()->tag);
+            Token* tmpToken = scan();
             son->setChild(tagSon);
             move();
             //nonterminal
-            auto idexprRes = idexpr(son);
+            // 传入ID，返回Var
+            cout<<"debug> "<<((Id*)tmpToken)->name<<endl;
+            auto idexprRes = idexpr(son, ((Id*)tmpToken)->name);
             if(!idexprRes.status) {
                 tokenIterator = last;
                 secondFlag = true;
+            } else {
+                returnRes.var = idexprRes.var;
             }
             break;
         }
         //terminal
         case LPAREN: {
+            cout<<"debug> LPAREN"<<endl;
+            // 表达式
             Terminal* tagSon = new Terminal(scan()->tag);
             son->setChild(tagSon);
             move();
@@ -1344,9 +1422,10 @@ matchInfo Parser::elem(Nonterminal* father) {
                     Terminal* tagSon = new Terminal(scan()->tag);
                     son->setChild(tagSon);
                     move();
+                    returnRes.var = exprRes.var;
                 } else {
                     tokenIterator = last;
-                   secondFlag = true;
+                    secondFlag = true;
                 }
             } else {
                 tokenIterator = last;
@@ -1360,18 +1439,25 @@ matchInfo Parser::elem(Nonterminal* father) {
         }
     }
     if(secondFlag) {
+        cout<<"debug> literal"<<endl;
         auto literalRes = literal(son);
         if(!literalRes.status) {
             tokenIterator = last;
             return {false, "(ID | LPAREN | literal) > " + literalRes.info};
+        } else {
+            returnRes.var = literalRes.var;
         }
     }
-
+    cout<<"     elem";
+    if(returnRes.var != NULL)
+        cout<<returnRes.var->type<<endl;
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
-matchInfo Parser::idexpr(Nonterminal* father) {
+// return Var
+// ID
+matchInfo Parser::idexpr(Nonterminal* father, string ID) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1380,11 +1466,13 @@ matchInfo Parser::idexpr(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //terminal
     if(scan()->tag == LBRACK) {
         Terminal* tagSon = new Terminal(scan()->tag);
         son->setChild(tagSon);
         move();
+
         //nonterminal
         auto exprRes = expr(son);
         if(exprRes.status) {
@@ -1393,15 +1481,20 @@ matchInfo Parser::idexpr(Nonterminal* father) {
                 Terminal* tagSon = new Terminal(scan()->tag);
                 son->setChild(tagSon);
                 move();
+                // 数组
+                Var* tmpVar = symTab.getVar(ID);
+                returnRes.var = ir.genArray(tmpVar, exprRes.var);
             } else {
                 //terminal
                 tokenIterator = last;
-                
+                // 变量
+                returnRes.var = symTab.getVar(ID);
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            // 变量
+            returnRes.var = symTab.getVar(ID);
         }
     //terminal
     } else if(scan()->tag == LPAREN) {
@@ -1416,26 +1509,33 @@ matchInfo Parser::idexpr(Nonterminal* father) {
                 Terminal* tagSon = new Terminal(scan()->tag);
                 son->setChild(tagSon);
                 move();
+                // 函数
+                Fun* tmpFun = symTab.getFun(ID, realargRes.varList);
+                returnRes.var = ir.genCall(tmpFun, realargRes.varList);
             } else {
                 //terminal
                 tokenIterator = last;
-                
+                // 变量
+                returnRes.var = symTab.getVar(ID);
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            // 变量
+            returnRes.var = symTab.getVar(ID);
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        // 变量
+        returnRes.var = symTab.getVar(ID);
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
+// 维护一个vector<Var*>,最终返回
 matchInfo Parser::realarg(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1445,26 +1545,32 @@ matchInfo Parser::realarg(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
+    vector<Var*> varList;
     //nonterminal
     auto argRes = arg(son);
     if(argRes.status) {
+        varList.push_back(argRes.var);
         //nonterminal
-        auto arglistRes = arglist(son);
+        auto arglistRes = arglist(son, varList);
         if(!arglistRes.status) {
             //terminal
             tokenIterator = last;
-            
+            returnRes.varList = varList;
+        } else {
+            returnRes.varList = arglistRes.varList;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        returnRes.varList = varList;
     }
 
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
+// return Var* 
 matchInfo Parser::arg(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1481,12 +1587,12 @@ matchInfo Parser::arg(Nonterminal* father) {
         tokenIterator = last;
         return {false, "expr > " + exprRes.info};
     }
-
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return exprRes;
 }
-matchInfo Parser::arglist(Nonterminal* father) {
+// 维护一个vector<Var*>,最终返回
+matchInfo Parser::arglist(Nonterminal* father, vector<Var*> varList) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
     //创建本层节点
@@ -1495,6 +1601,7 @@ matchInfo Parser::arglist(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //terminal
     if(scan()->tag == COMMA) {
         Terminal* tagSon = new Terminal(scan()->tag);
@@ -1504,28 +1611,32 @@ matchInfo Parser::arglist(Nonterminal* father) {
         auto argRes = arg(son);
         if(argRes.status) {
             //nonterminal
-            auto arglistRes = arglist(son);
+            varList.push_back(argRes.var);
+            auto arglistRes = arglist(son, varList);
             if(!arglistRes.status) {
                 //terminal
                 tokenIterator = last;
-                
+                returnRes.varList = varList;
+            } else {
+                returnRes.varList = arglistRes.varList;
             }
         } else {
             //terminal
             tokenIterator = last;
-            
+            returnRes.varList = varList;
         }
     } else {
         //terminal
         tokenIterator = last;
-        
+        returnRes.varList = varList;
     }
-
+    
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
 //switch
+// return var*
 matchInfo Parser::literal(Nonterminal* father) {
     //如果词记号到头，则直接返回
     if(scan() == NULL) return {true, "over"};  
@@ -1535,6 +1646,7 @@ matchInfo Parser::literal(Nonterminal* father) {
     list<Token*>::iterator last = tokenIterator;
     cout<<son->toString()<<endl;
 
+    matchInfo returnRes = {true, ""};
     //terminal
     Token* token = scan();
     switch(token->tag) {
@@ -1550,8 +1662,9 @@ matchInfo Parser::literal(Nonterminal* father) {
                 symTab.addStr(var);
             } else {
                 symTab.addVar(var);
-                cout<<"literal "<<var->type<<endl;
+                // cout<<"literal "<<var->type<<endl;
             }
+            returnRes.var = var;
             break;
         }
         default: {
@@ -1559,10 +1672,10 @@ matchInfo Parser::literal(Nonterminal* father) {
             return {false, "(NUM | CH || STR)"};
         }
     }
-
+    // cout<<"literal complete"<<endl;
     //匹配成功，装载节点
     father->setChild(son);
-    return {true, ""};
+    return returnRes;
 }
 //fixed
 matchInfo Parser::subprogram(Nonterminal* father) {
@@ -1699,7 +1812,7 @@ matchInfo Parser::statement(Nonterminal* father) {
             //nonterminal
             auto altexprRes = altexpr(son);
             if(altexprRes.status) {
-                cout<<altexprRes.var->name<<endl;
+                // cout<<altexprRes.var->name<<endl;
                 ir.genReturn(altexprRes.var);
                 //terminal
                 if(scan()->tag == SEMICON) {
