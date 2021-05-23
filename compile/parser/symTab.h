@@ -55,9 +55,13 @@ public:
     vector<InterInst*> instList;
     static Var* one;
     static Var* four;
+    // api
+    vector<Var*> getGlbVars();
 };
 //变量/常量
 class Var {
+private:
+    void clear();
 public:
     //是否为常量
     bool isLiteral;
@@ -113,9 +117,12 @@ public:
     bool isVoid();
     bool isBase();
     bool isRef();
+    int getVal();
     static Var* getVoid();
     static Var* getTrue();
     Var();
+    // api
+    string getRawStr();
 };
 //函数
 class Fun {
@@ -153,9 +160,8 @@ public:
 class GenIR {
 public:
     static int lbNum;
+    static int varNum;
     GenIR();
-// TODO init file
-    FILE* file;
     SymTab* symTab;
     void bindSymTab(SymTab* symTab);
     GenIR(SymTab* symTab);
@@ -217,6 +223,9 @@ public:
     void genElseTail(InterInst*& _exit);
     //
     static string genLb();
+    // self
+    static string genTmpVar();
+    // end self
     // 
     // 产生_exit标签，为其内部的break提供信息
     void genSwitchHead(InterInst*& _exit);
@@ -290,7 +299,8 @@ public:
     InterInst(Operator op, InterInst* interInst, Var* var);
     InterInst(Operator op, InterInst* interInst);
     InterInst(Operator op, Var* var1, Var* var2);
-    // ???
+    // tmp = lval OP rval
     InterInst(Operator op, Var* var1, Var* var2, Var* var3);
+    void print();
 };
 #endif

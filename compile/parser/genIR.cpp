@@ -2,6 +2,7 @@
 #include "semError.h"
 using namespace std;
 int GenIR::lbNum = 0;
+int GenIR::varNum = 0;
 GenIR::GenIR() {}
 GenIR::GenIR(SymTab* symTab) {
     this->symTab = symTab;
@@ -23,11 +24,6 @@ void GenIR::genReturn(Var* ret) {
     Fun* fun = symTab->curFun;
     // 返回值不是void，则不能返回void; 返回值是void，则只能返回void
     if(ret->isVoid() && fun->type != KW_VOID || ret->isBase() && fun->type == KW_VOID) {
-        if(ret->isVoid() && fun->type != KW_VOID) {
-            cout<<fun->type<<endl;
-            cout<<ret->type<<endl;
-            cout<<"?"<<endl;
-        }
         // 错误处理
         SEMERROR(RETURN_ERR, fun->name);
         return;
@@ -47,7 +43,7 @@ void GenIR::genReturn(Var* ret) {
 void GenIR::genFunHead(Fun* function) {
     function->enterScope();
     symTab->addInst(new InterInst(OP_ENTRY, function));
-    function->returnPoint = new InterInst;
+    function->returnPoint = new InterInst();
 }
 void GenIR::genFunTail(Fun* function) {
     symTab->addInst(function->returnPoint);
@@ -88,8 +84,9 @@ Var* GenIR::genAssign(Var* val) {
     // Var construct
     tmp = new Var(symTab->scopePath, val);
     symTab->addVar(tmp);
-    if(val->isRef())
+    if(val->isRef()) {
         symTab->addInst(new InterInst(OP_GET, tmp, val->ptr));
+    }
     else
         symTab->addInst(new InterInst(OP_AS, tmp, val));
     return tmp;
@@ -121,7 +118,6 @@ bool GenIR::typeCheck(Var* lval, Var* rval) {
     return flag;
 }
 Var* GenIR::genTwoOp(Var* lval, Tag opt, Var* rval) {
-    cout<<"============"<<endl;
     if(!lval || !rval) return NULL;
 
     if(lval->isVoid() || rval->isVoid()) {
@@ -161,6 +157,10 @@ Var* GenIR::genAdd(Var* lval, Var* rval) {
         tmp = new Var(symTab->scopePath, lval);
         // 将rval修正为实际的累加值
         rval = genMul(rval, Var::getStep(lval));
+    } else if(lval->isBase() && !rval->isBase()) {
+        tmp = new Var(symTab->scopePath, rval);
+        // 将lval修正为实际的累加值
+        lval = genMul(lval, Var::getStep(rval));
     } else if(lval->isBase() && rval->isBase()) {
         tmp = new Var(symTab->scopePath, KW_INT, false);
     } else {
@@ -168,7 +168,6 @@ Var* GenIR::genAdd(Var* lval, Var* rval) {
         return lval;
     }
     symTab->addVar(tmp);
-    cout<<"=="<<endl;
     symTab->addInst(new InterInst(OP_ADD, tmp, lval, rval));
     return tmp;
 }
@@ -423,6 +422,11 @@ string GenIR::genLb() {
     lbNum++;
     string lb = "@L";
     return lb + to_string(lbNum);
+}
+string GenIR::genTmpVar() {
+    varNum++;
+    string tmpName = "@V";
+    return tmpName + to_string(varNum);
 }
 // 产生_exit标签，为其内部的break提供信息
 void GenIR::genSwitchHead(InterInst*& _exit) {

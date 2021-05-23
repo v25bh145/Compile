@@ -8,7 +8,7 @@ main: $(mainObjects) main.o
 
 .PHONY: run
 run: main
-	./main test.cpp
+	./main test.cpp out.txt
 
 .PHONY: target
 target: main

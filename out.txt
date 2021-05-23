@@ -1,0 +1,132 @@
+section .data
+global a
+	a dd 4
+global str
+	str dd @V1
+global ch
+	ch db 99
+	@V1 db "i can fly~",0
+section .text
+global main
+main:
+	push ebp
+	mov ebp, esp
+	sub esp, 16
+	mov eax, 
+	mov [ebp-4], eax
+	mov eax, 
+	mov [ebp-8], eax
+	mov eax, 
+	mov [ebp-12], eax
+	mov eax, 
+	mov [ebp-16], eax
+global calculate
+calculate:
+	push ebp
+	mov ebp, esp
+	sub esp, 52
+	mov eax, 0
+	mov ebx, 4
+	imul eax, ebx
+	mov [ebp-8], eax
+	mov eax, [ebp-4]
+	mov ebx, [ebp-8]
+	add eax, ebx
+	mov [ebp-12], eax
+	mov eax, 99
+	mov ebx, 4
+	imul eax, ebx
+	mov [ebp-20], eax
+	mov eax, [ebp-4]
+	mov ebx, [ebp-20]
+	add eax, ebx
+	mov [ebp-24], eax
+	mov eax, [ebp-16]
+	mov ebx, [ebp-28]
+	add eax, ebx
+	mov [ebp-32], eax
+	mov eax, 
+	mov [ebp-36], eax
+	mov eax, [ebp-36]
+	mov eax, 
+	mov [ebp-40], eax
+	mov eax, [ebp-40]
+@L5: 
+	mov eax, [ebp-40]
+	mov ebx, 10
+	mov ecx, 0
+	cmp eax, ebx
+	setl cl
+	mov [ebp-44], ecx
+	mov eax, [ebp-44]
+	cmp eax, 0
+	je @L6
+	jmp @L7
+@L8: 
+	mov eax, 
+	mov [ebp-48], eax
+	mov eax, [ebp-48]
+	mov eax, [ebp-48]
+	mov eax, [ebp-40]
+	mov ebx, 1
+	add eax, ebx
+	mov [ebp-40], eax
+	jmp @L5
+@L7: 
+	mov eax, 
+	mov [ebp-52], eax
+	mov eax, [ebp-52]
+	mov eax, [ebp-52]
+	mov eax, [ebp-36]
+	mov ebx, 1
+	add eax, ebx
+	mov [ebp-36], eax
+	jmp @L8
+@L6: 
+@L4: 
+	mov esp ebp
+	pop ebp
+	ret
+global mwm
+mwm:
+	push ebp
+	mov ebp, esp
+	sub esp, 12
+	mov eax, 3
+	mov ebx, 1
+	imul eax, ebx
+	mov [ebp-4], eax
+	mov eax, @V1
+	mov [ebp-8], al
+	mov eax, 0
+	mov al, [str]
+	mov ebx, [ebp-4]
+	add eax, ebx
+	mov [ebp-8], al
+	mov eax, 0
+	mov al, [ebp-12]
+	jmp @L3
+@L3: 
+	mov esp ebp
+	pop ebp
+	ret
+global qwq
+qwq:
+	push ebp
+	mov ebp, esp
+	sub esp, 12
+	mov eax, [ebp-4]
+	jmp @L1
+@L1: 
+	mov esp ebp
+	pop ebp
+	ret
+global pwp
+pwp:
+	push ebp
+	mov ebp, esp
+	sub esp, 0
+@L2: 
+	mov esp ebp
+	pop ebp
+	ret

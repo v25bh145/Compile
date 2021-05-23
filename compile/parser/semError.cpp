@@ -27,6 +27,7 @@ void semError(int code, string name) {
         "return语句和函数返回值类型不匹配"
     };
     semErrorNum++;
+    cout<<"语义错误: "<<name<<" "<<semErrorTable[code]<<"."<<endl;
     printf("语义错误: %s %s.\n", name.c_str(), semErrorTable[code]);
 }
 void semWarn(int code, string name) {
@@ -35,5 +36,6 @@ void semWarn(int code, string name) {
         "函数返回值类型不精确匹配"
     };
     warnNum++;
-    printf("语义错误: %s %s.\n", name.c_str(), semWarnTable[code]);
+    cout<<"语义警告: "<<name<<" "<<semWarnTable[code]<<"."<<endl;
+    printf("语义警告: %s %s.\n", name.c_str(), semWarnTable[code]);
 }

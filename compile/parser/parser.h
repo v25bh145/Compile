@@ -43,9 +43,9 @@ class Parser {
         matchInfo block(Nonterminal* father);
         matchInfo funtail(Nonterminal* father, bool isExtern, Tag tag, string id, vector<Var*> paraList);
         matchInfo idtail(Nonterminal* father, bool isExtern, Tag tag, string id);
-        matchInfo paradata(Nonterminal* father);
-        matchInfo paradatatail(Nonterminal* father);
-        matchInfo paralist(Nonterminal* father);
+        matchInfo paradata(Nonterminal* father, Tag tag);
+        matchInfo paradatatail(Nonterminal* father, Tag tag, string id);
+        matchInfo paralist(Nonterminal* father, vector<Var*> varList);
         matchInfo subprogram(Nonterminal* father);
         matchInfo localdef(Nonterminal* father);
         matchInfo statement(Nonterminal* father);
@@ -98,6 +98,7 @@ class Parser {
         //in parserMain.cpp
         Nonterminal *run();
         int print(ParserSign* node, int stack);
+        SymTab* getSymTab();
 };
 
 #endif

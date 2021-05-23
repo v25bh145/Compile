@@ -6,9 +6,12 @@
 using namespace std;
 
 Nonterminal *Parser::run() {
+    // global
+    symTab.enter();
     matchInfo programRes = program(parserRoot);
     if(!programRes.status)
         cout<<programRes.info<<endl;
+    symTab.leave();
     return parserRoot;
 }
 //返回此节点递归包含的词法记号数
@@ -34,4 +37,8 @@ int Parser::print(ParserSign  *node, int stack) {
         res += print(*p, stack + 1);
     }
     return res;
+}
+
+SymTab* Parser::getSymTab() {
+    return &symTab;
 }

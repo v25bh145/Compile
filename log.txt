@@ -1,0 +1,1357 @@
+======词法分析======
+tag:KW_INT
+id:a
+tag:ASSIGN
+num:4
+tag:SEMICON
+tag:KW_CHAR
+tag:MUL
+id:str
+tag:ASSIGN
+str:i can fly~
+tag:SEMICON
+tag:KW_CHAR
+id:ch
+tag:ASSIGN
+char:c
+tag:SEMICON
+tag:KW_INT
+id:qwq
+tag:LPAREN
+tag:KW_INT
+id:a
+tag:COMMA
+tag:KW_CHAR
+tag:MUL
+id:d
+tag:COMMA
+tag:KW_INT
+id:c
+tag:RPAREN
+tag:LBRACE
+tag:KW_RETURN
+id:a
+tag:SEMICON
+tag:RBRACE
+tag:KW_VOID
+id:pwp
+tag:LPAREN
+tag:RPAREN
+tag:LBRACE
+tag:KW_RETURN
+tag:SEMICON
+tag:RBRACE
+tag:KW_CHAR
+id:mwm
+tag:LPAREN
+tag:RPAREN
+tag:LBRACE
+tag:KW_RETURN
+id:str
+tag:LBRACK
+num:3
+tag:RBRACK
+tag:SEMICON
+tag:RBRACE
+tag:KW_VOID
+id:calculate
+tag:LPAREN
+tag:KW_INT
+tag:MUL
+id:arr
+tag:RPAREN
+tag:LBRACE
+tag:KW_INT
+id:a
+tag:ASSIGN
+id:arr
+tag:LBRACK
+num:0
+tag:RBRACK
+tag:ADD
+id:arr
+tag:LBRACK
+num:99
+tag:RBRACK
+tag:SEMICON
+tag:KW_FOR
+tag:LPAREN
+tag:KW_INT
+id:i
+tag:ASSIGN
+id:a
+tag:SEMICON
+id:i
+tag:LT
+num:10
+tag:SEMICON
+id:i
+tag:INC
+tag:RPAREN
+tag:LBRACE
+id:a
+tag:INC
+tag:SEMICON
+tag:RBRACE
+tag:RBRACE
+tag:KW_INT
+id:main
+tag:LPAREN
+tag:RPAREN
+tag:LBRACE
+tag:KW_INT
+id:b
+tag:ASSIGN
+num:0
+tag:COMMA
+id:c
+tag:ASSIGN
+num:0
+tag:COMMA
+id:d
+tag:ASSIGN
+num:5
+tag:COMMA
+id:e
+tag:ASSIGN
+num:6
+tag:SEMICON
+tag:KW_CHAR
+tag:MUL
+id:f
+tag:ASSIGN
+str:string
+tag:SEMICON
+tag:KW_INT
+id:g
+tag:LBRACK
+num:100
+tag:RBRACK
+tag:SEMICON
+id:g
+tag:LBRACK
+num:0
+tag:RBRACK
+tag:ASSIGN
+num:5
+tag:SEMICON
+id:g
+tag:LBRACK
+num:99
+tag:RBRACK
+tag:ASSIGN
+num:4
+tag:SEMICON
+tag:KW_INT
+id:a
+tag:ASSIGN
+tag:LPAREN
+id:b
+tag:ADD
+id:c
+tag:RPAREN
+tag:DIV
+id:d
+tag:MOD
+id:e
+tag:MUL
+num:5
+tag:ADD
+id:qwq
+tag:LPAREN
+id:b
+tag:COMMA
+id:f
+tag:COMMA
+num:4
+tag:RPAREN
+tag:SEMICON
+id:calculate
+tag:LPAREN
+id:g
+tag:RPAREN
+tag:SEMICON
+tag:KW_SWITCH
+tag:LPAREN
+id:a
+tag:RPAREN
+tag:LBRACE
+tag:KW_CASE
+num:0
+tag:COLON
+id:b
+tag:ASSIGN
+num:0
+tag:SEMICON
+tag:KW_BREAK
+tag:SEMICON
+tag:KW_CASE
+num:1
+tag:COLON
+tag:KW_CASE
+num:2
+tag:COLON
+id:b
+tag:ASSIGN
+num:1
+tag:SEMICON
+tag:KW_BREAK
+tag:SEMICON
+tag:KW_DEFAULT
+tag:COLON
+id:b
+tag:ASSIGN
+num:2
+tag:SEMICON
+tag:RBRACE
+tag:KW_IF
+tag:LPAREN
+id:b
+tag:EQU
+id:c
+tag:RPAREN
+tag:LBRACE
+id:b
+tag:ASSIGN
+num:3
+tag:SEMICON
+tag:RBRACE
+tag:KW_ELSE
+tag:LBRACE
+id:b
+tag:ASSIGN
+num:4
+tag:SEMICON
+tag:RBRACE
+tag:KW_IF
+tag:LPAREN
+id:b
+tag:EQU
+num:4
+tag:RPAREN
+id:b
+tag:INC
+tag:SEMICON
+id:b
+tag:DEC
+tag:SEMICON
+tag:INC
+id:b
+tag:SEMICON
+tag:DEC
+id:b
+tag:SEMICON
+tag:KW_FOR
+tag:LPAREN
+tag:KW_INT
+id:i
+tag:ASSIGN
+num:0
+tag:SEMICON
+id:i
+tag:LT
+id:b
+tag:SEMICON
+id:i
+tag:INC
+tag:RPAREN
+tag:LBRACE
+id:b
+tag:INC
+tag:SEMICON
+tag:RBRACE
+tag:KW_DO
+tag:LBRACE
+id:b
+tag:INC
+tag:SEMICON
+tag:RBRACE
+tag:KW_WHILE
+tag:LPAREN
+id:b
+tag:LT
+num:10
+tag:RPAREN
+tag:SEMICON
+tag:KW_WHILE
+tag:LPAREN
+id:b
+tag:LT
+num:20
+tag:RPAREN
+tag:LBRACE
+id:b
+tag:INC
+tag:SEMICON
+tag:RBRACE
+tag:KW_RETURN
+num:1
+tag:SEMICON
+tag:RBRACE
+tag:END
+======词法分析======
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+PROGRAM
+SEGMENT
+TYPE
+DEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+DEFLIST
+PARA
+TYPE
+PARADATA
+PARADATATAIL
+PARALIST
+TYPE
+PARADATA
+PARALIST
+TYPE
+PARADATA
+PARADATATAIL
+PARALIST
+FUNTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+DEFLIST
+PARA
+TYPE
+FUNTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+DEFLIST
+PARA
+TYPE
+FUNTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+DEFLIST
+PARA
+TYPE
+PARADATA
+PARALIST
+FUNTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+FORINIT
+LOCALDEF
+TYPE
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+IDEXPR
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+SUBPROGRAM
+LOCALDEF
+TYPE
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+PROGRAM
+SEGMENT
+TYPE
+DEF
+IDTAIL
+VARRDEF
+INIT
+DEFLIST
+PARA
+TYPE
+FUNTAIL
+BLOCK
+SUBPROGRAM
+LOCALDEF
+TYPE
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+DEFDATA
+VARRDEF
+INIT
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+ROP
+ITEMTAIL
+MULS
+ALOTAIL
+ADDS
+CMPTAIL
+CMPS
+ANDTAIL
+ORTAIL
+ASSTAIL
+DEFLIST
+SUBPROGRAM
+LOCALDEF
+TYPE
+DEFDATA
+INIT
+DEFLIST
+STATEMENT
+ALTEXPR
+EXPR
+ASSEXPR
+OREXPR
+ANDEXPR
+CMPEXPR
+ALOEXPR
+ITEM
+FACTOR
+CMPS
+VAL
+ELEM
+LITERAL
+WHILESTAT
+FORSTAT
+DOWHILESTAT
+IFSTAT
+SWITCHSTAT
+======符号表分析======
+变量
+> type: 3, name: @V13, scopePath: /1/5/6
+> type: 3, name: @V14, scopePath: /1/5/6
+> type: 3, name: @V12, scopePath: /1/5/6
+> type: 3, name: i, scopePath: /1/5/6
+> type: 3, name: @V10, scopePath: /1/5
+> type: 4, name: d, scopePath: /1/2
+> type: 3, name: d, scopePath: /1/7
+> type: 4, name: <char>, scopePath: 
+> type: 3, name: arr, scopePath: /1/5
+> type: 3, name: @V5, scopePath: /1/5
+> type: 4, name: @V4, scopePath: /1/4
+> type: 3, name: e, scopePath: /1/7
+> type: 3, name: b, scopePath: /1/7
+> type: 3, name: @V11, scopePath: /1/5
+> type: 3, name: a, scopePath: /1
+> type: 3, name: a, scopePath: /1/2
+> type: 3, name: a, scopePath: /1/5
+> type: 4, name: str, scopePath: /1
+> type: 3, name: @V6, scopePath: /1/5
+> type: 4, name: ch, scopePath: /1
+> type: 3, name: @V3, scopePath: /1/4
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 3, name: <int>, scopePath: 
+> type: 4, name: @V2, scopePath: /1/4
+> type: 3, name: @V8, scopePath: /1/5
+> type: 3, name: c, scopePath: /1/2
+> type: 3, name: c, scopePath: /1/7
+> type: 3, name: @V7, scopePath: /1/5
+> type: 3, name: @V9, scopePath: /1/5
+函数
+> type: 3, name: main, scopeEsp: /0
+varList:
+
+> type: 5, name: calculate, scopeEsp: /4
+varList:
+     > type: 3, name: arr, scopePath: /1/5
+
+> type: 4, name: mwm, scopeEsp: /0
+varList:
+
+> type: 3, name: qwq, scopeEsp: /12
+varList:
+     > type: 3, name: a, scopePath: /1/2
+     > type: 4, name: d, scopePath: /1/2
+     > type: 3, name: c, scopePath: /1/2
+
+> type: 5, name: pwp, scopeEsp: /0
+varList:
+
+======符号表分析======
+======中间代码分析======
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1
+     op: 1
+     label: 
+Inst:
+     arg1 name: str, tag: 4, scopePath: /1
+     op: 1
+     label: 
+Inst:
+     arg1 name: ch, tag: 4, scopePath: /1
+     op: 1
+     label: 
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1/2
+     op: 1
+     label: 
+Inst:
+     arg1 name: d, tag: 4, scopePath: /1/2
+     op: 1
+     label: 
+Inst:
+     arg1 name: c, tag: 3, scopePath: /1/2
+     op: 1
+     label: 
+Inst:
+     fun name: qwq, tag: 3, scopeEsp: /12
+     op: 2
+     label: 
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1/2
+     op: 31
+     label: 
+     has target
+Inst:
+     op: 0
+     label: @L1
+Inst:
+     fun name: qwq, tag: 3, scopeEsp: /12
+     op: 3
+     label: 
+Inst:
+     fun name: pwp, tag: 5, scopeEsp: /0
+     op: 2
+     label: 
+Inst:
+     op: 0
+     label: @L2
+Inst:
+     fun name: pwp, tag: 5, scopeEsp: /0
+     op: 3
+     label: 
+Inst:
+     fun name: mwm, tag: 4, scopeEsp: /0
+     op: 2
+     label: 
+Inst:
+     arg1 name: @V3, tag: 3, scopePath: /1/4
+     op: 1
+     label: 
+Inst:
+     arg1 name: <int>, tag: 3, scopePath: 
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: @V3, tag: 3, scopePath: /1/4
+     op: 7
+     label: 
+Inst:
+     arg1 name: @V2, tag: 4, scopePath: /1/4
+     op: 1
+     label: 
+Inst:
+     arg1 name: str, tag: 4, scopePath: /1
+     arg2 name: @V3, tag: 3, scopePath: /1/4
+     result name: @V2, tag: 4, scopePath: /1/4
+     op: 5
+     label: 
+Inst:
+     arg1 name: @V4, tag: 4, scopePath: /1/4
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V4, tag: 4, scopePath: /1/4
+     op: 31
+     label: 
+     has target
+Inst:
+     op: 0
+     label: @L3
+Inst:
+     fun name: mwm, tag: 4, scopeEsp: /0
+     op: 3
+     label: 
+Inst:
+     arg1 name: arr, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     fun name: calculate, tag: 5, scopeEsp: /4
+     op: 2
+     label: 
+Inst:
+     arg1 name: @V6, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: <int>, tag: 3, scopePath: 
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: @V6, tag: 3, scopePath: /1/5
+     op: 7
+     label: 
+Inst:
+     arg1 name: @V5, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: arr, tag: 3, scopePath: /1/5
+     arg2 name: @V6, tag: 3, scopePath: /1/5
+     result name: @V5, tag: 3, scopePath: /1/5
+     op: 5
+     label: 
+Inst:
+     arg1 name: @V7, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V9, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: <int>, tag: 3, scopePath: 
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: @V9, tag: 3, scopePath: /1/5
+     op: 7
+     label: 
+Inst:
+     arg1 name: @V8, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: arr, tag: 3, scopePath: /1/5
+     arg2 name: @V9, tag: 3, scopePath: /1/5
+     result name: @V8, tag: 3, scopePath: /1/5
+     op: 5
+     label: 
+Inst:
+     arg1 name: @V10, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V11, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V7, tag: 3, scopePath: /1/5
+     arg2 name: @V10, tag: 3, scopePath: /1/5
+     result name: @V11, tag: 3, scopePath: /1/5
+     op: 5
+     label: 
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1/5
+     op: 1
+     label: 
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1/5
+     arg2 name: @V11, tag: 3, scopePath: /1/5
+     op: 4
+     label: 
+Inst:
+     arg1 name: i, tag: 3, scopePath: /1/5/6
+     op: 1
+     label: 
+Inst:
+     arg1 name: i, tag: 3, scopePath: /1/5/6
+     arg2 name: a, tag: 3, scopePath: /1/5
+     op: 4
+     label: 
+Inst:
+     op: 0
+     label: @L5
+Inst:
+     arg1 name: @V12, tag: 3, scopePath: /1/5/6
+     op: 1
+     label: 
+Inst:
+     arg1 name: i, tag: 3, scopePath: /1/5/6
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: @V12, tag: 3, scopePath: /1/5/6
+     op: 13
+     label: 
+Inst:
+     arg1 name: @V12, tag: 3, scopePath: /1/5/6
+     op: 25
+     label: 
+     has target
+Inst:
+     op: 23
+     label: 
+     has target
+Inst:
+     op: 0
+     label: @L8
+Inst:
+     arg1 name: @V13, tag: 3, scopePath: /1/5/6
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V13, tag: 3, scopePath: /1/5/6
+     arg2 name: a, tag: 3, scopePath: /1/5
+     op: 4
+     label: 
+Inst:
+     arg1 name: @V13, tag: 3, scopePath: /1/5/6
+     arg2 name: i, tag: 3, scopePath: /1/5/6
+     op: 4
+     label: 
+Inst:
+     arg1 name: i, tag: 3, scopePath: /1/5/6
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: i, tag: 3, scopePath: /1/5/6
+     op: 5
+     label: 
+Inst:
+     op: 23
+     label: 
+     has target
+Inst:
+     op: 0
+     label: @L7
+Inst:
+     arg1 name: @V14, tag: 3, scopePath: /1/5/6
+     op: 1
+     label: 
+Inst:
+     arg1 name: @V14, tag: 3, scopePath: /1/5/6
+     arg2 name: @V11, tag: 3, scopePath: /1/5
+     op: 4
+     label: 
+Inst:
+     arg1 name: @V14, tag: 3, scopePath: /1/5/6
+     arg2 name: a, tag: 3, scopePath: /1/5
+     op: 4
+     label: 
+Inst:
+     arg1 name: a, tag: 3, scopePath: /1/5
+     arg2 name: <int>, tag: 3, scopePath: 
+     result name: a, tag: 3, scopePath: /1/5
+     op: 5
+     label: 
+Inst:
+     op: 23
+     label: 
+     has target
+Inst:
+     op: 0
+     label: @L6
+Inst:
+     op: 0
+     label: @L4
+Inst:
+     fun name: calculate, tag: 5, scopeEsp: /4
+     op: 3
+     label: 
+Inst:
+     fun name: main, tag: 3, scopeEsp: /0
+     op: 2
+     label: 
+Inst:
+     arg1 name: b, tag: 3, scopePath: /1/7
+     op: 1
+     label: 
+Inst:
+     arg1 name: c, tag: 3, scopePath: /1/7
+     op: 1
+     label: 
+Inst:
+     arg1 name: d, tag: 3, scopePath: /1/7
+     op: 1
+     label: 
+Inst:
+     arg1 name: e, tag: 3, scopePath: /1/7
+     op: 1
+     label: 
+======中间代码分析======
+======生成asm分析======
+function's interInst size: 5
+function's interInst size: 38
+function's interInst size: 9
+function's interInst size: 7
+function's interInst size: 3
+======生成asm分析======
+YES BANGDREAM!
